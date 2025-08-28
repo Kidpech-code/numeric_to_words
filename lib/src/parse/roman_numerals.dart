@@ -1,12 +1,28 @@
 /// Roman numeral parsing utilities.
+library;
+
 /// Supports standard symbols I,V,X,L,C,D,M with subtractive notation (IV, IX, XL, XC, CD, CM).
 /// Also supports an optional overline (combining overline \u0305) to multiply a symbol by 1000
 /// e.g., M\u0305 = 1,000,000 (M with overline). If overline usage is not present, standard values apply.
 
-const Map<String, int> _romanBase = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000};
+const Map<String, int> _romanBase = {
+  'I': 1,
+  'V': 5,
+  'X': 10,
+  'L': 50,
+  'C': 100,
+  'D': 500,
+  'M': 1000,
+};
 
-/// Parse a Roman numeral string to integer (BigInt).
-/// Throws [FormatException] if invalid.
+/// Parse a Roman numeral string to integer ([BigInt]).
+///
+/// Supports subtractive notation (e.g., `IV`, `IX`, `XL`, `XC`, `CD`, `CM`).
+/// Also understands combining overline (U+0305) immediately following a symbol
+/// to multiply that symbol's value by 1,000. For example, `M\u0305` yields
+/// 1,000,000.
+///
+/// Throws a [FormatException] if the input is empty or contains invalid symbols.
 BigInt parseRoman(String roman) {
   if (roman.isEmpty) throw FormatException('Empty roman numeral');
 

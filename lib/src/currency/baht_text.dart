@@ -7,7 +7,10 @@ import '../core/number_to_words.dart';
 /// - Rounds to 2 decimal places (สตางค์) using half-up rounding.
 /// - Uses "...บาทถ้วน" when the satang part is zero.
 /// - Supports negative amounts by prefixing with options.negativeWord.
-String thaiBahtText(num amount, {ThaiBahtTextOptions options = const ThaiBahtTextOptions()}) {
+String thaiBahtText(
+  num amount, {
+  ThaiBahtTextOptions options = const ThaiBahtTextOptions(),
+}) {
   if (amount.isNaN) {
     throw ArgumentError('amount is NaN');
   }

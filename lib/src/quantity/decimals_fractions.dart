@@ -6,7 +6,10 @@ import '../core/number_to_words.dart';
 /// - 0.5 -> ศูนย์จุดห้า
 /// - with fixedFractionDigits: 2, 0.5 -> ศูนย์จุดห้าศูนย์
 /// - 1.0 -> หนึ่ง (by default), unless [options.omitPointWhenFractionZero] is false.
-String thaiDecimal(num value, {ThaiDecimalOptions options = const ThaiDecimalOptions()}) {
+String thaiDecimal(
+  num value, {
+  ThaiDecimalOptions options = const ThaiDecimalOptions(),
+}) {
   if (value.isNaN) throw ArgumentError('value is NaN');
   if (!value.isFinite) throw ArgumentError('value is not finite');
 
@@ -25,12 +28,24 @@ String thaiDecimal(num value, {ThaiDecimalOptions options = const ThaiDecimalOpt
   final intWords = thaiNumberToWords(intPart, options: options);
 
   // If fraction zeros and omit flag => just integer words.
-  final isFractionAllZeros = fracPart.isEmpty || RegExp(r'^0+$').hasMatch(fracPart);
+  final isFractionAllZeros =
+      fracPart.isEmpty || RegExp(r'^0+$').hasMatch(fracPart);
   if (isFractionAllZeros && options.omitPointWhenFractionZero) {
     return isNegative ? '${options.negativeWord}$intWords' : intWords;
   }
 
-  final digitMap = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  final digitMap = [
+    '',
+    'หนึ่ง',
+    'สอง',
+    'สาม',
+    'สี่',
+    'ห้า',
+    'หก',
+    'เจ็ด',
+    'แปด',
+    'เก้า',
+  ];
   final fracWords = fracPart.split('').map((ch) {
     final d = int.parse(ch);
     return digitMap[d].isEmpty ? options.zeroWord : digitMap[d];
@@ -40,7 +55,9 @@ String thaiDecimal(num value, {ThaiDecimalOptions options = const ThaiDecimalOpt
     ..write(intWords)
     ..write(options.decimalPointWord)
     ..write(fracWords);
-  return isNegative ? '${options.negativeWord}${result.toString()}' : result.toString();
+  return isNegative
+      ? '${options.negativeWord}${result.toString()}'
+      : result.toString();
 }
 
 /// Reads a fraction in Thai using the pattern "X ส่วน Y".
@@ -48,7 +65,11 @@ String thaiDecimal(num value, {ThaiDecimalOptions options = const ThaiDecimalOpt
 /// - 1/2 -> หนึ่งส่วนสอง
 /// - 3/4 -> สามส่วนสี่
 /// - negative numerator or denominator prefixes with negativeWord.
-String thaiFraction(BigInt numerator, BigInt denominator, {ThaiNumberOptions options = const ThaiNumberOptions()}) {
+String thaiFraction(
+  BigInt numerator,
+  BigInt denominator, {
+  ThaiNumberOptions options = const ThaiNumberOptions(),
+}) {
   if (denominator == BigInt.zero) {
     throw ArgumentError('denominator must not be zero');
   }
@@ -65,5 +86,7 @@ String thaiFraction(BigInt numerator, BigInt denominator, {ThaiNumberOptions opt
     ..write(numWords)
     ..write('ส่วน')
     ..write(denWords);
-  return signNegative ? '${options.negativeWord}${phrase.toString()}' : phrase.toString();
+  return signNegative
+      ? '${options.negativeWord}${phrase.toString()}'
+      : phrase.toString();
 }

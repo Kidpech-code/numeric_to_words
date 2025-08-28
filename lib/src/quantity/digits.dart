@@ -24,7 +24,9 @@ String thaiDigits(String numeric, {ThaiDigitsOptions options = const ThaiDigitsO
 
   // Validate characters (digits and optional one dot)
   final dotCount = '.'.allMatches(s).length;
-  if (dotCount > 1) throw ArgumentError('numeric contains more than one decimal point');
+  if (dotCount > 1) {
+    throw ArgumentError('numeric contains more than one decimal point');
+  }
   if (!RegExp(r'^[0-9]+(\.[0-9]+)?$').hasMatch(s)) {
     throw ArgumentError('numeric contains invalid characters');
   }

@@ -2,10 +2,19 @@ import 'options.dart';
 
 /// Converts an integer to Thai words.
 ///
+/// Contract:
+/// - Input: any [BigInt] (positive, zero, or negative).
+/// - Output: Thai words without spaces (e.g. 121 -> "หนึ่งร้อยยี่สิบเอ็ด").
+/// - Errors: none for valid [BigInt] input.
+///
+/// Notes:
 /// - Supports arbitrarily large integers via [BigInt].
-/// - Handles negative numbers (prefix with options.negativeWord).
-/// - Returns options.zeroWord when value is zero.
-String thaiNumberToWords(BigInt value, {ThaiNumberOptions options = const ThaiNumberOptions()}) {
+/// - Handles negative numbers (prefix with [ThaiNumberOptions.negativeWord]).
+/// - Returns [ThaiNumberOptions.zeroWord] when value is zero.
+String thaiNumberToWords(
+  BigInt value, {
+  ThaiNumberOptions options = const ThaiNumberOptions(),
+}) {
   final isNegative = value.isNegative;
   final absVal = (isNegative ? -value : value);
 
@@ -17,14 +26,28 @@ String thaiNumberToWords(BigInt value, {ThaiNumberOptions options = const ThaiNu
   return isNegative ? '${options.negativeWord}$words' : words;
 }
 
-/// Convenience overload for int.
-String thaiIntToWords(int value, {ThaiNumberOptions options = const ThaiNumberOptions()}) {
+/// Convenience overload for `int`.
+String thaiIntToWords(
+  int value, {
+  ThaiNumberOptions options = const ThaiNumberOptions(),
+}) {
   return thaiNumberToWords(BigInt.from(value), options: options);
 }
 
 /// Internal Thai number formatter implementation.
 class _ThaiNumberFormatter {
-  static const List<String> _digits = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  static const List<String> _digits = [
+    '',
+    'หนึ่ง',
+    'สอง',
+    'สาม',
+    'สี่',
+    'ห้า',
+    'หก',
+    'เจ็ด',
+    'แปด',
+    'เก้า',
+  ];
 
   /// Format arbitrary non-negative integer to Thai words.
   static String _formatBigInt(BigInt n) {
@@ -103,7 +126,8 @@ class _ThaiNumberFormatter {
     // Units place
     final unit = digits[5];
     if (unit != 0) {
-      final hasHigher = n > 10; // any higher place implies n > 10 for Thai "เอ็ด"
+      final hasHigher =
+          n > 10; // any higher place implies n > 10 for Thai "เอ็ด"
       if (unit == 1 && hasHigher) {
         sb.write('เอ็ด');
       } else {

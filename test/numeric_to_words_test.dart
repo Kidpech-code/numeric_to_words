@@ -22,7 +22,10 @@ void main() {
       expect(thaiIntToWords(1000011), 'หนึ่งล้านสิบเอ็ด');
       expect(thaiIntToWords(2000000), 'สองล้าน');
       expect(thaiIntToWords(2500000), 'สองล้านห้าแสน');
-      expect(thaiIntToWords(2523456), 'สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก');
+      expect(
+        thaiIntToWords(2523456),
+        'สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก',
+      );
     });
   });
 
@@ -44,7 +47,10 @@ void main() {
     test('rounding', () {
       expect(thaiBahtText(1.005), 'หนึ่งบาทหนึ่งสตางค์'); // 1.005 -> 1.01
       expect(thaiBahtText(2.999), 'สามบาทถ้วน'); // 299.9 -> 300 satang
-      expect(thaiBahtText(1234.567), 'หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบเจ็ดสตางค์');
+      expect(
+        thaiBahtText(1234.567),
+        'หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบเจ็ดสตางค์',
+      );
     });
 
     test('negative amounts', () {
@@ -52,7 +58,11 @@ void main() {
     });
 
     test('custom units', () {
-      const opts = ThaiBahtTextOptions(majorUnit: 'ดอลลาร์', minorUnit: 'เซนต์', integerSuffix: 'ถ้วน');
+      const opts = ThaiBahtTextOptions(
+        majorUnit: 'ดอลลาร์',
+        minorUnit: 'เซนต์',
+        integerSuffix: 'ถ้วน',
+      );
       expect(thaiBahtText(10.5, options: opts), 'สิบดอลลาร์ห้าสิบเซนต์');
     });
   });
@@ -62,12 +72,24 @@ void main() {
       expect(thaiDecimal(0.5), 'ศูนย์จุดห้า');
       expect(thaiDecimal(-0.5), 'ลบศูนย์จุดห้า');
       expect(thaiDecimal(1.0), 'หนึ่ง'); // default omit when .0
-      expect(thaiDecimal(1.0, options: ThaiDecimalOptions(omitPointWhenFractionZero: false)), 'หนึ่งจุดศูนย์');
+      expect(
+        thaiDecimal(
+          1.0,
+          options: ThaiDecimalOptions(omitPointWhenFractionZero: false),
+        ),
+        'หนึ่งจุดศูนย์',
+      );
     });
 
     test('fixed fraction digits', () {
-      expect(thaiDecimal(0.5, options: ThaiDecimalOptions(fixedFractionDigits: 2)), 'ศูนย์จุดห้าศูนย์');
-      expect(thaiDecimal(1.2, options: ThaiDecimalOptions(fixedFractionDigits: 3)), 'หนึ่งจุดสองศูนย์ศูนย์');
+      expect(
+        thaiDecimal(0.5, options: ThaiDecimalOptions(fixedFractionDigits: 2)),
+        'ศูนย์จุดห้าศูนย์',
+      );
+      expect(
+        thaiDecimal(1.2, options: ThaiDecimalOptions(fixedFractionDigits: 3)),
+        'หนึ่งจุดสองศูนย์ศูนย์',
+      );
     });
   });
 
@@ -94,7 +116,16 @@ void main() {
     });
 
     test('with decimal point and separator', () {
-      expect(thaiDigits('12.30', options: const ThaiDigitsOptions(includeDecimalPoint: true, separator: ' ')), 'หนึ่ง สอง จุด สาม ศูนย์');
+      expect(
+        thaiDigits(
+          '12.30',
+          options: const ThaiDigitsOptions(
+            includeDecimalPoint: true,
+            separator: ' ',
+          ),
+        ),
+        'หนึ่ง สอง จุด สาม ศูนย์',
+      );
     });
   });
 
