@@ -7,3 +7,14 @@
 - Digit-by-digit reading helper with options.
 - Thai numerals normalization and parsing; Arabic↔Thai digits.
 - Roman numerals parsing (incl. subtractive) and direct Thai words output; overline ×1000 support.
+
+## 0.1.1
+
+- Rename package to `thai_number_words` for pub.dev availability.
+- Update README badges and imports accordingly.
+
+## 0.1.2
+
+- Add package-matching entrypoint `lib/thai_number_words.dart` (keeps legacy entrypoint too).
+- README: add English summary and prefer new entrypoint import.
+- Formatting polish to satisfy pub score.

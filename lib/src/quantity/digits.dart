@@ -4,7 +4,10 @@ import '../parse/thai_numerals.dart';
 /// Reads a number as individual Thai digits without composing into place-value words.
 /// Example: 12345 -> "หนึ่งสองสามสี่ห้า".
 /// Supports negative and optional decimal point word.
-String thaiDigits(String numeric, {ThaiDigitsOptions options = const ThaiDigitsOptions()}) {
+String thaiDigits(
+  String numeric, {
+  ThaiDigitsOptions options = const ThaiDigitsOptions(),
+}) {
   if (numeric.isEmpty) {
     throw ArgumentError('numeric is empty');
   }
@@ -31,7 +34,18 @@ String thaiDigits(String numeric, {ThaiDigitsOptions options = const ThaiDigitsO
     throw ArgumentError('numeric contains invalid characters');
   }
 
-  final digitMap = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  final digitMap = [
+    'ศูนย์',
+    'หนึ่ง',
+    'สอง',
+    'สาม',
+    'สี่',
+    'ห้า',
+    'หก',
+    'เจ็ด',
+    'แปด',
+    'เก้า',
+  ];
   final out = <String>[];
 
   for (final ch in s.split('')) {
