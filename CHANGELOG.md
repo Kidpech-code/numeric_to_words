@@ -2,6 +2,10 @@
 
 - Initial release as a pure Dart package.
 - Thai integer to words with correct phrasing rules.
+
+## 0.1.3
+- Docs polish for pub points: move full Thai-language section to `docs/README.th.md` and keep main README primarily English.
+- Fixed an unclosed code block in README.
 - Baht text with half-up rounding to 2 decimals and customizable units.
 - Decimals (digit-by-digit after point) and Fractions utilities.
 - Digit-by-digit reading helper with options.
