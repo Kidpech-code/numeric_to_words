@@ -1,9 +1,9 @@
-## numeric_to_words
+## thai_number_words
 
-[![Pub Version](https://img.shields.io/pub/v/numeric_to_words)](https://pub.dev/packages/numeric_to_words)
-[![Pub Points](https://img.shields.io/pub/points/numeric_to_words)](https://pub.dev/packages/numeric_to_words/score)
-[![Popularity](https://img.shields.io/pub/popularity/numeric_to_words)](https://pub.dev/packages/numeric_to_words/score)
-[![Likes](https://img.shields.io/pub/likes/numeric_to_words)](https://pub.dev/packages/numeric_to_words)
+[![Pub Version](https://img.shields.io/pub/v/thai_number_words)](https://pub.dev/packages/thai_number_words)
+[![Pub Points](https://img.shields.io/pub/points/thai_number_words)](https://pub.dev/packages/thai_number_words/score)
+[![Popularity](https://img.shields.io/pub/popularity/thai_number_words)](https://pub.dev/packages/thai_number_words/score)
+[![Likes](https://img.shields.io/pub/likes/thai_number_words)](https://pub.dev/packages/thai_number_words)
 
 ตัวช่วยแปลงตัวเลขเป็นข้อความภาษาไทยแบบใช้งานง่าย ปรับแต่งได้ แยก utilities ตามหมวดหมู่ชัดเจน เช่น จำนวนเต็ม สกุลเงิน (บาท/สตางค์) จำนวนทศนิยม และเศษส่วน
 
@@ -18,7 +18,7 @@
 ## เริ่มต้นใช้งาน
 
 ```dart
-import 'package:numeric_to_words/numeric_to_words.dart';
+import 'package:thai_number_words/numeric_to_words.dart';
 ```
 
 ## ตัวอย่างการใช้งาน
