@@ -1,0 +1,26 @@
+name: numeric_to_words
+description: "Thai number-to-words utilities: baht text, integers, decimals, fractions, digit-by-digit, Thai/Arabic numerals, and Roman numerals."
+version: 0.1.0
+# homepage: https://your.homepage/
+# repository: https://github.com/your/repo
+# issue_tracker: https://github.com/your/repo/issues
+
+environment:
+  sdk: ^3.8.1
+
+topics:
+  - thai
+  - number-to-words
+  - baht
+  - numerals
+  - roman-numerals
+
+dependencies:
+  # No runtime dependencies.
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
