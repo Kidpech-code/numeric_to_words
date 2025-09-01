@@ -16,7 +16,10 @@ void main() {
   print(
     thaiBahtText(
       10.5,
-      options: const ThaiBahtTextOptions(majorUnit: 'ดอลลาร์', minorUnit: 'เซนต์'),
+      options: const ThaiBahtTextOptions(
+        majorUnit: 'ดอลลาร์',
+        minorUnit: 'เซนต์',
+      ),
     ),
   );
   // สิบดอลลาร์ห้าสิบเซนต์
@@ -24,8 +27,15 @@ void main() {
   // Decimals
   print(thaiDecimal(0.5)); // ศูนย์จุดห้า
   print(thaiDecimal(1.0)); // หนึ่ง
-  print(thaiDecimal(1.0, options: const ThaiDecimalOptions(omitPointWhenFractionZero: false))); // หนึ่งจุดศูนย์
-  print(thaiDecimal(0.5, options: const ThaiDecimalOptions(fixedFractionDigits: 2))); // ศูนย์จุดห้าศูนย์
+  print(
+    thaiDecimal(
+      1.0,
+      options: const ThaiDecimalOptions(omitPointWhenFractionZero: false),
+    ),
+  ); // หนึ่งจุดศูนย์
+  print(
+    thaiDecimal(0.5, options: const ThaiDecimalOptions(fixedFractionDigits: 2)),
+  ); // ศูนย์จุดห้าศูนย์
 
   // Fractions
   print(thaiFraction(BigInt.one, BigInt.two)); // หนึ่งส่วนสอง

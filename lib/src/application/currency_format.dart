@@ -16,7 +16,8 @@ String _roundHalfUpToCentsString(num amount) {
     whole += 1;
     minor = 0;
   }
-  final res = '${negative ? '-' : ''}$whole.${minor.toString().padLeft(2, '0')}';
+  final res =
+      '${negative ? '-' : ''}$whole.${minor.toString().padLeft(2, '0')}';
   return res;
 }
 
@@ -47,7 +48,18 @@ String _englishIntToWords(BigInt n) {
     'eighteen',
     'nineteen',
   ];
-  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const tens = [
+    '',
+    '',
+    'twenty',
+    'thirty',
+    'forty',
+    'fifty',
+    'sixty',
+    'seventy',
+    'eighty',
+    'ninety',
+  ];
   final scales = <BigInt>[
     BigInt.parse('1000000000000000000'), // quintillion
     BigInt.parse('1000000000000000'), // quadrillion
@@ -57,7 +69,15 @@ String _englishIntToWords(BigInt n) {
     BigInt.parse('1000'), // thousand
     BigInt.one,
   ];
-  const scaleNames = <String>['quintillion', 'quadrillion', 'trillion', 'billion', 'million', 'thousand', ''];
+  const scaleNames = <String>[
+    'quintillion',
+    'quadrillion',
+    'trillion',
+    'billion',
+    'million',
+    'thousand',
+    '',
+  ];
 
   String chunkToWords(int v) {
     if (v == 0) return '';
@@ -108,12 +128,16 @@ String englishCurrencyText(num amount, CurrencyUnit currency) {
   final whole = BigInt.parse(parts[0]);
   final minor = int.parse(parts[1]);
   final wholeWords = _englishIntToWords(whole);
-  final wholeUnit = whole == BigInt.one ? currency.englishSingular : currency.englishPlural;
+  final wholeUnit = whole == BigInt.one
+      ? currency.englishSingular
+      : currency.englishPlural;
   if (minor == 0) {
     final s = '$wholeWords $wholeUnit';
     return neg ? 'minus $s' : s;
   }
-  final minorUnit = minor == 1 ? (currency.englishMinorSingular ?? 'cent') : (currency.englishMinorPlural ?? 'cents');
+  final minorUnit = minor == 1
+      ? (currency.englishMinorSingular ?? 'cent')
+      : (currency.englishMinorPlural ?? 'cents');
   final minorWords = _englishIntToWords(BigInt.from(minor));
   final s = '$wholeWords $wholeUnit and $minorWords $minorUnit';
   return neg ? 'minus $s' : s;
