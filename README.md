@@ -1,4 +1,3 @@
-
 ## Thai Number Words
 
 Lightweight, pure-Dart utilities to convert numbers to Thai words: integers, currency (Baht text),
@@ -28,6 +27,13 @@ import 'package:thai_number_words/thai_number_words.dart';
 // (Legacy entrypoint remains available: package:thai_number_words/numeric_to_words.dart)
 ```
 
+## Install
+
+```yaml
+dependencies:
+  thai_number_words: ^0.2.1
+```
+
 ## Examples (Quick Start)
 
 See the full runnable example in [example/](example/).
@@ -53,6 +59,25 @@ thaiBahtText(
 	10.5,
 	options: const ThaiBahtTextOptions(majorUnit: 'ดอลลาร์', minorUnit: 'เซนต์'),
 ); // "สิบดอลลาร์ห้าสิบเซนต์"
+```
+
+### Currency (English/Thai words):
+
+Use the built-in registry for currency names and format in English or Thai.
+
+```dart
+// English words
+final usd = CurrencyRegistry.byCode['USD']!;
+englishCurrencyText(25, usd); // "twenty-five dollars"
+englishCurrencyText(1.05, usd); // "one dollar and five cents"
+
+// Thai words for non-THB currency (uses a space between number and unit)
+thaiCurrencyText(25, usd); // "ยี่สิบห้า ดอลลาร์สหรัฐ"
+
+// Currencies without minor units example (JPY)
+final jpy = CurrencyRegistry.byCode['JPY']!;
+englishCurrencyText(1250, jpy); // "one thousand two hundred fifty yen"
+thaiCurrencyText(1250, jpy); // "หนึ่งพันสองร้อยห้าสิบ เยน"
 ```
 
 ### Decimals:
@@ -100,31 +125,41 @@ parseRoman('M\u0305'); // 1000000
 romanToThaiWords('M\u0305'); // "หนึ่งล้าน"
 ```
 
+### Thai numerals utilities:
+
+Convert between Arabic and Thai digits, and parse Thai digits to numbers.
+
+```dart
+arabicDigitsToThai('123'); // "๑๒๓"
+thaiNumeralsToArabic('๑๒๓'); // "123"
+parseThaiInteger('๑๒๓'); // BigInt(123)
+```
+
 ### Quick table: Roman ↔ Arabic ↔ Thai words
 
-| Roman | Arabic   | Thai words  |
-|-------|----------|-------------|
-| I     | 1        | หนึ่ง       |
-| IV    | 4        | สี่         |
-| V     | 5        | ห้า         |
-| IX    | 9        | เก้า        |
-| X     | 10       | สิบ         |
-| XL    | 40       | สี่สิบ      |
-| L     | 50       | ห้าสิบ      |
-| XC    | 90       | เก้าสิบ     |
-| C     | 100      | หนึ่งร้อย   |
-| D     | 500      | ห้าร้อย     |
-| M     | 1000     | หนึ่งพัน    |
-| M\u0305 | 1,000,000 | หนึ่งล้าน |
+| Roman   | Arabic    | Thai words |
+| ------- | --------- | ---------- |
+| I       | 1         | หนึ่ง      |
+| IV      | 4         | สี่        |
+| V       | 5         | ห้า        |
+| IX      | 9         | เก้า       |
+| X       | 10        | สิบ        |
+| XL      | 40        | สี่สิบ     |
+| L       | 50        | ห้าสิบ     |
+| XC      | 90        | เก้าสิบ    |
+| C       | 100       | หนึ่งร้อย  |
+| D       | 500       | ห้าร้อย    |
+| M       | 1000      | หนึ่งพัน   |
+| M\u0305 | 1,000,000 | หนึ่งล้าน  |
 
 ## Summary: integers vs decimals/fractions
 
-| Number | Integers | Decimals/Fractions                                                      |
-|--------|----------|-------------------------------------------------------------------------|
-| 1.0    | หนึ่ง    | หนึ่ง (or "หนึ่งจุดศูนย์" with omitPointWhenFractionZero: false)         |
-| 0.5    | –        | ศูนย์จุดห้า (or "ศูนย์จุดห้าศูนย์" when fixedFractionDigits: 2)          |
-| 1/2    | –        | หนึ่งส่วนสอง                                                            |
-| 3/4    | –        | สามส่วนสี่                                                              |
+| Number | Integers | Decimals/Fractions                                               |
+| ------ | -------- | ---------------------------------------------------------------- |
+| 1.0    | หนึ่ง    | หนึ่ง (or "หนึ่งจุดศูนย์" with omitPointWhenFractionZero: false) |
+| 0.5    | –        | ศูนย์จุดห้า (or "ศูนย์จุดห้าศูนย์" when fixedFractionDigits: 2)  |
+| 1/2    | –        | หนึ่งส่วนสอง                                                     |
+| 3/4    | –        | สามส่วนสี่                                                       |
 
 ## Options
 
@@ -165,4 +200,4 @@ const digitOpts = ThaiDigitsOptions(
 
 ---
 
-Thai readers: อ่านเอกสารฉบับเต็มภาษาไทยได้ที่ docs/README.th.md
+Thai readers: อ่านเอกสารฉบับเต็มภาษาไทยได้ที่ doc/README.th.md

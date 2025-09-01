@@ -3,6 +3,10 @@
 - Initial release as a pure Dart package.
 - Thai integer to words with correct phrasing rules.
 
+## 0.2.1
+
+- Style: Run dart format across sources to satisfy pub.dev static analysis formatting check.
+
 ## 0.1.3
 
 - Docs polish for pub points: move full Thai-language section to `docs/README.th.md` and keep main README primarily English.
