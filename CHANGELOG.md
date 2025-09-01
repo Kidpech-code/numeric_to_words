@@ -4,8 +4,16 @@
 - Thai integer to words with correct phrasing rules.
 
 ## 0.1.3
+
 - Docs polish for pub points: move full Thai-language section to `docs/README.th.md` and keep main README primarily English.
 - Fixed an unclosed code block in README.
+
+## 0.2.0
+
+- Feature: English currency words with pluralization and half-up rounding to cents.
+- Feature: Thai currency words for non-THB units using registry-based names (spacing rules applied).
+- Add DDD-style structure: domain (CurrencyUnit), infrastructure (CurrencyRegistry), application (currency_format).
+- Update example to show "twenty-five dollars" and Thai "ยี่สิบห้า ดอลลาร์สหรัฐ" outputs.
 - Baht text with half-up rounding to 2 decimals and customizable units.
 - Decimals (digit-by-digit after point) and Fractions utilities.
 - Digit-by-digit reading helper with options.
