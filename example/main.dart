@@ -16,10 +16,7 @@ void main() {
   print(
     thaiBahtText(
       10.5,
-      options: const ThaiBahtTextOptions(
-        majorUnit: 'ดอลลาร์',
-        minorUnit: 'เซนต์',
-      ),
+      options: const ThaiBahtTextOptions(majorUnit: 'ดอลลาร์', minorUnit: 'เซนต์'),
     ),
   );
   // สิบดอลลาร์ห้าสิบเซนต์
@@ -27,18 +24,16 @@ void main() {
   // Decimals
   print(thaiDecimal(0.5)); // ศูนย์จุดห้า
   print(thaiDecimal(1.0)); // หนึ่ง
-  print(
-    thaiDecimal(
-      1.0,
-      options: const ThaiDecimalOptions(omitPointWhenFractionZero: false),
-    ),
-  ); // หนึ่งจุดศูนย์
-  print(
-    thaiDecimal(0.5, options: const ThaiDecimalOptions(fixedFractionDigits: 2)),
-  ); // ศูนย์จุดห้าศูนย์
+  print(thaiDecimal(1.0, options: const ThaiDecimalOptions(omitPointWhenFractionZero: false))); // หนึ่งจุดศูนย์
+  print(thaiDecimal(0.5, options: const ThaiDecimalOptions(fixedFractionDigits: 2))); // ศูนย์จุดห้าศูนย์
 
   // Fractions
   print(thaiFraction(BigInt.one, BigInt.two)); // หนึ่งส่วนสอง
   print(thaiFraction(BigInt.from(3), BigInt.from(4))); // สามส่วนสี่
   print(thaiFraction(BigInt.from(-1), BigInt.from(2))); // ลบหนึ่งส่วนสอง
+
+  // New: English/Thai currency formatting for USD
+  final usd = CurrencyRegistry.byCode['USD']!;
+  print(englishCurrencyText(25, usd)); // twenty-five dollars
+  print(thaiCurrencyText(25, usd)); // ยี่สิบห้า ดอลลาร์สหรัฐ
 }
