@@ -24,8 +24,30 @@ void main() {
       expect(thaiIntToWords(2500000), 'สองล้านห้าแสน');
       expect(
         thaiIntToWords(2523456),
-        'สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก',
+        'สองล้านห้าแสนสองสิบสามพันสี่ร้อยห้าสิบหก',
       );
+    });
+
+    test('correct usage of ยี่ for higher denominations', () {
+      // Test cases mentioned in the problem statement
+      expect(thaiIntToWords(23000), 'สองสิบสามพัน');
+      expect(thaiIntToWords(21000), 'สองสิบเอ็ดพัน');
+      expect(thaiIntToWords(25000), 'สองสิบห้าพัน');
+      expect(thaiIntToWords(20000), 'สองสิบพัน');
+      expect(thaiIntToWords(10000), 'สิบพัน');
+      
+      // Additional test cases to ensure ยี่ is only used with สิบ
+      expect(thaiIntToWords(220000), 'สองแสนสองสิบพัน');
+      expect(thaiIntToWords(2300000), 'สองล้านสามแสน');
+      expect(thaiIntToWords(230000), 'สองแสนสามสิบพัน');
+      expect(thaiIntToWords(123000), 'หนึ่งแสนสองสิบสามพัน');
+      
+      // Verify ยี่ is still used correctly for tens place only
+      expect(thaiIntToWords(20), 'ยี่สิบ');
+      expect(thaiIntToWords(21), 'ยี่สิบเอ็ด');
+      expect(thaiIntToWords(29), 'ยี่สิบเก้า');
+      expect(thaiIntToWords(120), 'หนึ่งร้อยยี่สิบ');
+      expect(thaiIntToWords(1023), 'หนึ่งพันยี่สิบสาม');
     });
   });
 
