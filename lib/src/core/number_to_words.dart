@@ -99,7 +99,7 @@ class _ThaiNumberFormatter {
     final th = digits[2];
     final ttTh = tt * 10 + th;
     if (ttTh != 0) {
-      sb.write(_formatTwoDigits(ttTh));
+      sb.write(_formatTwoDigitsForHigherDenominations(ttTh));
       sb.write('พัน');
     }
 
@@ -138,8 +138,9 @@ class _ThaiNumberFormatter {
     return sb.toString();
   }
 
-  /// Format 1..99 as Thai words (no unit suffix). 0 returns ''.
-  static String _formatTwoDigits(int n) {
+  /// Format 1..99 as Thai words for higher denominations (พัน, แสน, etc.).
+  /// Never uses 'ยี่' - always uses 'สอง' for 20-29 range.
+  static String _formatTwoDigitsForHigherDenominations(int n) {
     assert(n >= 0 && n < 100);
     if (n == 0) return '';
     if (n < 10) return _digits[n];
@@ -148,9 +149,8 @@ class _ThaiNumberFormatter {
     final sb = StringBuffer();
     if (tens == 1) {
       sb.write('สิบ');
-    } else if (tens == 2) {
-      sb.write('ยี่สิบ');
     } else {
+      // Always use 'สอง' instead of 'ยี่' for higher denominations
       sb.write(_digits[tens]);
       sb.write('สิบ');
     }
