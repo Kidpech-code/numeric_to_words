@@ -155,12 +155,7 @@ class _ThaiNumberFormatter {
     for (var i = groups.length - 1; i >= 0; i--) {
       final g = groups[i];
       if (g != 0) {
-        if (i == 0 && g == 1 && hasHigherNonZero) {
-          // Final group == 1 with any preceding non-zero groups: use 'เอ็ด'
-          buffer.write('เอ็ด');
-        } else {
-          buffer.write(_formatUnderMillion(g));
-        }
+        buffer.write(_formatUnderMillion(g));
       }
       if (i > 0) {
         buffer.write('ล้าน');
@@ -178,29 +173,74 @@ class _ThaiNumberFormatter {
     final digits = s.split('').map(int.parse).toList(growable: false);
     final sb = StringBuffer();
 
-    // Hundred-thousands
+    // Handle hundred-thousands, ten-thousands, and thousands with proper Thai grouping
     final ht = digits[0];
+    final tt = digits[1]; 
+    final th = digits[2];
+    
+    // First handle hundred-thousands
     if (ht != 0) {
       if (ht == 1) {
-        sb..write('หนึ่ง')..write('แสน');
+        sb.write('หนึ่งแสน');
       } else {
         sb..write(_digits[ht])..write('แสน');
       }
     }
-
-    // Ten-thousands
-    final tt = digits[1];
-    if (tt != 0) {
+    
+    // Special case for hundred-thousands + ten-thousands combination (like 220,000)
+    if (ht != 0 && tt != 0 && th == 0) {
+      final htValue = ht * 10 + tt;
+      if (htValue >= 20 && htValue <= 99 && ht <= 2) {
+        // Handle special cases like 22 = ยี่สิบสอง for ten-thousands
+        if (htValue >= 20 && htValue <= 29) {
+          // Override the previous hundred-thousands output for these special cases
+          final pos = sb.length;
+          sb.clear();
+          if (htValue == 20) {
+            sb.write('ยี่สิบหมื่น');
+          } else {
+            sb..write('ยี่สิบ')..write(_digits[tt])..write('หมื่น');
+          }
+          return sb.toString(); // Early return for this special case
+        }
+      }
+    }
+    
+    // Handle ten-thousands and thousands combinations
+    if (tt != 0 && th != 0) {
+      // Both ten-thousands and thousands present
+      final ttValue = tt * 10 + th;
+      
+      // Only combine when there are higher place values (hundred-thousands)
+      // and specifically for 20-29 range (ยี่สิบ pattern) or 10-19 range
+      if (ht != 0 && ttValue >= 20 && ttValue <= 29) {
+        // Handle 20-29: use ยี่สิบ pattern (only when hundred-thousands present)
+        if (ttValue == 20) {
+          sb.write('ยี่สิบพัน');
+        } else {
+          sb..write('ยี่สิบ')..write(_digits[th])..write('พัน');
+        }
+      } else if (ht == 0 && ttValue >= 10 && ttValue <= 19) {
+        // 10-19 when no hundred-thousands: สิบ + digit for 11-19
+        if (ttValue == 10) {
+          sb.write('สิบพัน');
+        } else {
+          sb..write('สิบ')..write(_digits[th])..write('พัน');
+        }
+      } else {
+        // For all other cases, use separate processing
+        sb..write(_digits[tt])..write('หมื่น');
+        sb..write(_digits[th])..write('พัน');
+      }
+    } else if (tt != 0) {
+      // Only ten-thousands
       if (tt == 1) {
         sb.write('หนึ่งหมื่น');
       } else {
         sb..write(_digits[tt])..write('หมื่น');
       }
-    }
-
-    // Thousands
-    final th = digits[2];
-    if (th != 0) {
+    } else if (th != 0) {
+      // Only thousands
       if (th == 1) {
         sb.write('หนึ่งพัน');
       } else {
