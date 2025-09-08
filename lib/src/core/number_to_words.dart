@@ -1,16 +1,5 @@
 import 'options.dart';
 
-/// Converts an integer to Thai words.
-///
-/// Contract:
-/// - Input: any [BigInt] (positive, zero, or negative).
-/// - Output: Thai words without spaces (e.g. 121 -> "หนึ่งร้อยยี่สิบเอ็ด").
-/// - Errors: none for valid [BigInt] input.
-///
-/// Notes:
-/// - Supports arbitrarily large integers via [BigInt].
-/// - Handles negative numbers (prefix with [ThaiNumberOptions.negativeWord]).
-/// - Returns [ThaiNumberOptions.zeroWord] when value is zero.
 String thaiNumberToWords(
   BigInt value, {
   ThaiNumberOptions options = const ThaiNumberOptions(),
@@ -23,10 +12,9 @@ String thaiNumberToWords(
   }
 
   final words = _ThaiNumberFormatter._formatBigInt(absVal);
-  return isNegative ? '${options.negativeWord}$words' : words;
+  return isNegative ? '${options.negativeWord}\$words' : words;
 }
 
-/// Convenience overload for `int`.
 String thaiIntToWords(
   int value, {
   ThaiNumberOptions options = const ThaiNumberOptions(),
@@ -34,7 +22,6 @@ String thaiIntToWords(
   return thaiNumberToWords(BigInt.from(value), options: options);
 }
 
-/// Internal Thai number formatter implementation.
 class _ThaiNumberFormatter {
   static const List<String> _digits = [
     '',
@@ -49,7 +36,6 @@ class _ThaiNumberFormatter {
     'เก้า',
   ];
 
-  /// Format arbitrary non-negative integer to Thai words.
   static String _formatBigInt(BigInt n) {
     assert(n >= BigInt.zero);
 
@@ -78,10 +64,9 @@ class _ThaiNumberFormatter {
     return result.isEmpty ? 'ศูนย์' : result;
   }
 
-  /// Format a number in range 1..999,999 to Thai words.
   static String _formatUnderMillion(int n) {
     assert(n >= 0 && n < 1000000);
-    if (n == 0) return '';
+    if (n == 0) return ''; 
 
     final s = n.toString().padLeft(6, '0');
     final digits = s.split('').map(int.parse).toList(growable: false);
@@ -90,17 +75,34 @@ class _ThaiNumberFormatter {
     // Hundred-thousands
     final ht = digits[0];
     if (ht != 0) {
-      sb.write(_digits[ht]);
-      sb.write('แสน');
+      if (ht == 1) {
+        sb.write('หนึ่งแสน');
+      } else {
+        sb.write(_digits[ht]);
+        sb.write('แสน');
+      }
     }
 
-    // Ten-thousands and thousands combined as two-digit phrase + 'พัน'
+    // Ten-thousands
     final tt = digits[1];
+    if (tt != 0) {
+      if (tt == 1) {
+        sb.write('หนึ่งหมื่น');
+      } else {
+        sb.write(_digits[tt]);
+        sb.write('หมื่น');
+      }
+    }
+
+    // Thousands
     final th = digits[2];
-    final ttTh = tt * 10 + th;
-    if (ttTh != 0) {
-      sb.write(_formatTwoDigits(ttTh));
-      sb.write('พัน');
+    if (th != 0) {
+      if (th == 1) {
+        sb.write('หนึ่งพัน');
+      } else {
+        sb.write(_digits[th]);
+        sb.write('พัน');
+      }
     }
 
     // Hundreds
@@ -126,8 +128,7 @@ class _ThaiNumberFormatter {
     // Units place
     final unit = digits[5];
     if (unit != 0) {
-      final hasHigher =
-          n > 10; // any higher place implies n > 10 for Thai "เอ็ด"
+      final hasHigher = n > 10;
       if (unit == 1 && hasHigher) {
         sb.write('เอ็ด');
       } else {
@@ -135,32 +136,6 @@ class _ThaiNumberFormatter {
       }
     }
 
-    return sb.toString();
-  }
-
-  /// Format 1..99 as Thai words (no unit suffix). 0 returns ''.
-  static String _formatTwoDigits(int n) {
-    assert(n >= 0 && n < 100);
-    if (n == 0) return '';
-    if (n < 10) return _digits[n];
-    final tens = n ~/ 10;
-    final ones = n % 10;
-    final sb = StringBuffer();
-    if (tens == 1) {
-      sb.write('สิบ');
-    } else if (tens == 2) {
-      sb.write('ยี่สิบ');
-    } else {
-      sb.write(_digits[tens]);
-      sb.write('สิบ');
-    }
-    if (ones != 0) {
-      if (ones == 1) {
-        sb.write('เอ็ด');
-      } else {
-        sb.write(_digits[ones]);
-      }
-    }
     return sb.toString();
   }
 }
