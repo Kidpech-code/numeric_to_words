@@ -3,7 +3,7 @@ import 'package:thai_number_words/thai_number_words.dart';
 void main() {
   // Integers
   print(thaiIntToWords(121)); // หนึ่งร้อยยี่สิบเอ็ด
-  print(thaiIntToWords(2523456)); // สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก
+  print(thaiIntToWords(2523456)); // สองล้านห้าแสนสองหมื่นสามพันสี่ร้อยห้าสิบหก
   print(thaiIntToWords(-1)); // ลบหนึ่ง
 
   // Baht Text
@@ -23,6 +23,14 @@ void main() {
     ),
   );
   // สิบดอลลาร์ห้าสิบเซนต์
+
+  // Omit 'ถ้วน' for integer baht
+  print(
+    thaiBahtText(
+      100,
+      options: const ThaiBahtTextOptions(useIntegerSuffix: false),
+    ),
+  ); // หนึ่งร้อยบาท
 
   // Decimals
   print(thaiDecimal(0.5)); // ศูนย์จุดห้า

@@ -31,7 +31,7 @@ import 'package:thai_number_words/thai_number_words.dart';
 
 ```yaml
 dependencies:
-  thai_number_words: ^0.2.1
+  thai_number_words: ^0.2.2
 ```
 
 ## Examples (Quick Start)
@@ -42,7 +42,7 @@ See the full runnable example in [example/](example/).
 
 ```dart
 thaiIntToWords(121); // "หนึ่งร้อยยี่สิบเอ็ด"
-thaiIntToWords(2523456); // "สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก"
+thaiIntToWords(2523456); // "สองล้านห้าแสนสองหมื่นสามพันสี่ร้อยห้าสิบหก"
 thaiIntToWords(-1); // "ลบหนึ่ง"
 ```
 
@@ -59,6 +59,9 @@ thaiBahtText(
 	10.5,
 	options: const ThaiBahtTextOptions(majorUnit: 'ดอลลาร์', minorUnit: 'เซนต์'),
 ); // "สิบดอลลาร์ห้าสิบเซนต์"
+
+// Omit 'ถ้วน' for integer baht
+thaiBahtText(100, options: const ThaiBahtTextOptions(useIntegerSuffix: false)); // "หนึ่งร้อยบาท"
 ```
 
 ### Currency (English/Thai words):
@@ -171,6 +174,7 @@ const numOpts = ThaiNumberOptions(negativeWord: 'ติดลบ', zeroWord: '�
 const bahtOpts = ThaiBahtTextOptions(
 	majorUnit: 'บาท',
 	integerSuffix: 'ถ้วน',
+	useIntegerSuffix: true, // set to false to omit 'ถ้วน'
 );
 
 // Customize decimal reading

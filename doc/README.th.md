@@ -32,7 +32,7 @@ import 'package:thai_number_words/thai_number_words.dart';
 
 ```dart
 thaiIntToWords(121); // "หนึ่งร้อยยี่สิบเอ็ด"
-thaiIntToWords(2523456); // "สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก"
+thaiIntToWords(2523456); // "สองล้านห้าแสนสองหมื่นสามพันสี่ร้อยห้าสิบหก"
 thaiIntToWords(-1); // "ลบหนึ่ง"
 ```
 
@@ -49,6 +49,9 @@ thaiBahtText(
   10.5,
   options: const ThaiBahtTextOptions(majorUnit: 'ดอลลาร์', minorUnit: 'เซนต์'),
 ); // "สิบดอลลาร์ห้าสิบเซนต์"
+
+// ไม่เติม 'ถ้วน' กรณีจำนวนเต็ม
+thaiBahtText(100, options: const ThaiBahtTextOptions(useIntegerSuffix: false)); // "หนึ่งร้อยบาท"
 ```
 
 ### ทศนิยม (Decimals)
@@ -112,6 +115,7 @@ const bahtOpts = ThaiBahtTextOptions(
   majorUnit: 'บาท',
   minorUnit: 'สตางค์',
   integerSuffix: 'ถ้วน',
+  useIntegerSuffix: true, // กำหนด false เพื่อไม่เติม 'ถ้วน'
 );
 
 const decOpts = ThaiDecimalOptions(

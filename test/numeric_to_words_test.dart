@@ -2,6 +2,50 @@ import 'package:test/test.dart';
 import 'package:thai_number_words/thai_number_words.dart';
 
 void main() {
+  group('BAHTTEXT/Office standard edge cases', () {
+    test('BAHTTEXT/Office examples', () {
+      expect(thaiBahtText(0), 'ศูนย์บาทถ้วน');
+      expect(thaiBahtText(1), 'หนึ่งบาทถ้วน');
+      expect(thaiBahtText(5), 'ห้าบาทถ้วน');
+      expect(thaiBahtText(10), 'สิบบาทถ้วน');
+      expect(thaiBahtText(11), 'สิบเอ็ดบาทถ้วน');
+      expect(thaiBahtText(21.25), 'ยี่สิบเอ็ดบาทยี่สิบห้าสตางค์');
+      expect(thaiBahtText(12345), 'หนึ่งหมื่นสองพันสามร้อยสี่สิบห้าบาทถ้วน');
+      expect(
+        thaiBahtText(12345.67),
+        'หนึ่งหมื่นสองพันสามร้อยสี่สิบห้าบาทหกสิบเจ็ดสตางค์',
+      );
+      expect(thaiBahtText(0.004), 'ศูนย์บาทถ้วน');
+      expect(thaiBahtText(1.004), 'หนึ่งบาทถ้วน');
+      expect(thaiBahtText(1.005), 'หนึ่งบาทหนึ่งสตางค์');
+      expect(thaiBahtText(0.995), 'หนึ่งบาทถ้วน');
+      expect(thaiBahtText(1.994), 'หนึ่งบาทเก้าสิบเก้าสตางค์');
+      expect(thaiBahtText(1.995), 'สองบาทถ้วน');
+      expect(thaiBahtText(100001), 'หนึ่งแสนเอ็ดบาทถ้วน');
+      expect(thaiBahtText(1000001), 'หนึ่งล้านเอ็ดบาทถ้วน');
+      expect(thaiBahtText(1001000001), 'หนึ่งพันหนึ่งล้านเอ็ดบาทถ้วน');
+      expect(
+        thaiBahtText(1001001000001),
+        'หนึ่งล้านหนึ่งพันหนึ่งล้านเอ็ดบาทถ้วน',
+      );
+      expect(thaiBahtText(9009009000000), 'เก้าล้านเก้าพันเก้าล้านบาทถ้วน');
+      expect(
+        thaiBahtText(9998830750500),
+        'เก้าล้านเก้าแสนเก้าหมื่นแปดพันแปดร้อยสามสิบล้านเจ็ดแสนห้าหมื่นห้าร้อยบาทถ้วน',
+      );
+      // 220,000 = สองแสนสองหมื่น
+      expect(thaiIntToWords(220000), 'สองแสนสองหมื่น');
+      // 1,000,001 = หนึ่งล้านเอ็ด
+      expect(thaiIntToWords(1000001), 'หนึ่งล้านเอ็ด');
+      // 1,001,000,001 = หนึ่งพันหนึ่งล้านเอ็ด
+      expect(thaiIntToWords(1001000001), 'หนึ่งพันหนึ่งล้านเอ็ด');
+      // 9,998,830,750,501 = เก้าล้านเก้าแสนเก้าหมื่นแปดพันแปดร้อยสามสิบล้านเจ็ดแสนห้าหมื่นห้าร้อยเอ็ด
+      expect(
+        thaiIntToWords(9998830750501),
+        'เก้าล้านเก้าแสนเก้าหมื่นแปดพันแปดร้อยสามสิบล้านเจ็ดแสนห้าหมื่นห้าร้อยเอ็ด',
+      );
+    });
+  });
   group('thaiIntToWords', () {
     test('zero and negatives', () {
       expect(thaiIntToWords(0), 'ศูนย์');
@@ -18,13 +62,13 @@ void main() {
       expect(thaiIntToWords(121), 'หนึ่งร้อยยี่สิบเอ็ด');
       expect(thaiIntToWords(1000), 'หนึ่งพัน');
       expect(thaiIntToWords(1000000), 'หนึ่งล้าน');
-      expect(thaiIntToWords(1000001), 'หนึ่งล้านหนึ่ง');
+      expect(thaiIntToWords(1000001), 'หนึ่งล้านเอ็ด');
       expect(thaiIntToWords(1000011), 'หนึ่งล้านสิบเอ็ด');
       expect(thaiIntToWords(2000000), 'สองล้าน');
       expect(thaiIntToWords(2500000), 'สองล้านห้าแสน');
       expect(
         thaiIntToWords(2523456),
-        'สองล้านห้าแสนยี่สิบสามพันสี่ร้อยห้าสิบหก',
+        'สองล้านห้าแสนสองหมื่นสามพันสี่ร้อยห้าสิบหก',
       );
     });
   });

@@ -1,3 +1,10 @@
+## 0.2.2
+
+- Feature: Add `useIntegerSuffix` option to `ThaiBahtTextOptions` for controlling whether to append 'ถ้วน' for integer baht (default true).
+- Docs: Overhaul all documentation and examples to strictly match BAHTTEXT/Office standard and correct Thai number reading rules.
+- Fix: All examples and tests now use the correct Thai phrasing for all edge cases (e.g., 2523456 = "สองล้านห้าแสนสองหมื่นสามพันสี่ร้อยห้าสิบหก").
+- Polish: README (EN/TH) and example/main.dart updated for clarity and accuracy.
+
 ## 0.1.0
 
 - Initial release as a pure Dart package.

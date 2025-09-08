@@ -11,6 +11,9 @@ class ThaiNumberOptions {
 
 /// Options controlling Baht text formatting.
 class ThaiBahtTextOptions extends ThaiNumberOptions {
+  /// Whether to append the integerSuffix (e.g. 'ถ้วน') when there is no minor part. Default: true.
+  final bool useIntegerSuffix;
+
   /// Major currency unit (default: บาท).
   final String majorUnit;
 
@@ -26,6 +29,7 @@ class ThaiBahtTextOptions extends ThaiNumberOptions {
     this.majorUnit = 'บาท',
     this.minorUnit = 'สตางค์',
     this.integerSuffix = 'ถ้วน',
+    this.useIntegerSuffix = true,
   });
 }
 

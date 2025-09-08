@@ -80,7 +80,8 @@ String thaiBahtText(
     // Total in 10^-scale units.
     // Convert to satang: multiply by 100, then divide by 10^scale with rounding.
     final power = BigInt.from(10).pow(scale);
-    final scaled = bigIntPart * power + fracInt; // integer representing value * 10^scale
+    final scaled =
+        bigIntPart * power + fracInt; // integer representing value * 10^scale
     if (power == BigInt.zero) {
       satangTotal = bigIntPart * BigInt.from(100);
     } else {
@@ -89,7 +90,9 @@ String thaiBahtText(
       final quotient = numerator ~/ power;
       final remainder = numerator % power;
       // Rounding: compare remainder * 2 >= power
-      satangTotal = (remainder * BigInt.from(2) >= power) ? (quotient + BigInt.one) : quotient;
+      satangTotal = (remainder * BigInt.from(2) >= power)
+          ? (quotient + BigInt.one)
+          : quotient;
     }
   } else if (amount is num) {
     if (amount.isNaN) throw ArgumentError('amount is NaN');
@@ -100,7 +103,10 @@ String thaiBahtText(
     }
     // Avoid double precision issues by using string with adequate precision.
     final asStr = amount.toStringAsFixed(10); // high precision buffer
-    return thaiBahtText(asStr, options: options).replaceFirst(options.negativeWord, negative ? options.negativeWord : '');
+    return thaiBahtText(
+      asStr,
+      options: options,
+    ).replaceFirst(options.negativeWord, negative ? options.negativeWord : '');
   } else if (amount is BigInt) {
     satangTotal = amount * BigInt.from(100);
   } else {
@@ -108,16 +114,41 @@ String thaiBahtText(
   }
 
   if (negative) {
-    return options.negativeWord + thaiBahtText(_satangBigIntToDecimalString(satangTotal), options: options);
+    return options.negativeWord +
+        thaiBahtText(
+          _satangBigIntToDecimalString(satangTotal),
+          options: options,
+        );
   }
 
   final baht = satangTotal ~/ BigInt.from(100);
   final satang = (satangTotal % BigInt.from(100)).toInt();
 
   if (satang == 0) {
-    return thaiNumberToWords(baht, options: options) + 'บาทถ้วน';
+    String suffix = 'ถ้วน';
+    if (options is ThaiBahtTextOptions) {
+      suffix = options.useIntegerSuffix ? options.integerSuffix : '';
+    }
+    return '${thaiNumberToWords(baht, options: options)}บาท$suffix';
   }
-  return thaiNumberToWords(baht, options: options) + 'บาท' + thaiNumberToWords(BigInt.from(satang), options: options) + 'สตางค์';
+  // Special case: if original input is between 0 and 1 (omit 'ศูนย์บาท')
+  num? originalNum;
+  if (amount is num) {
+    originalNum = amount;
+  } else if (amount is String) {
+    final cleaned = amount.replaceAll(',', '');
+    originalNum = num.tryParse(cleaned);
+  }
+  if (baht == BigInt.zero &&
+      originalNum != null &&
+      originalNum > 0 &&
+      originalNum < 1) {
+    return '${thaiNumberToWords(BigInt.from(satang), options: options)}สตางค์';
+  }
+  if (baht == BigInt.zero) {
+    return '${thaiNumberToWords(BigInt.from(satang), options: options)}สตางค์';
+  }
+  return '${thaiNumberToWords(baht, options: options)}บาท${thaiNumberToWords(BigInt.from(satang), options: options)}สตางค์';
 }
 
 String _satangBigIntToDecimalString(BigInt satang) {
@@ -132,14 +163,23 @@ String _satangBigIntToDecimalString(BigInt satang) {
 
 class _ThaiNumberFormatter {
   static const List<String> _digits = [
-    '', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'
+    '',
+    'หนึ่ง',
+    'สอง',
+    'สาม',
+    'สี่',
+    'ห้า',
+    'หก',
+    'เจ็ด',
+    'แปด',
+    'เก้า',
   ];
 
   static String _formatBigInt(BigInt n) {
     assert(n >= BigInt.zero);
-
+    // Split into groups of 6 digits (ล้าน)
     final million = BigInt.from(1000000);
-    final groups = <int>[]; // each 0..999,999 (base 1,000,000)
+    final groups = <int>[];
     var x = n;
     while (x > BigInt.zero) {
       final q = x ~/ million;
@@ -149,20 +189,25 @@ class _ThaiNumberFormatter {
     }
     if (groups.isEmpty) return 'ศูนย์';
 
-    final hasHigherNonZero = groups.length > 1 && groups.skip(1).any((g) => g != 0);
-
     final buffer = StringBuffer();
     for (var i = groups.length - 1; i >= 0; i--) {
       final g = groups[i];
+      final isLastGroup = (i == 0);
+      final isSingleGroup = (groups.length == 1);
+      final isOnlyOne = (n == BigInt.one && isSingleGroup);
       if (g != 0) {
-        if (i == 0 && g == 1 && hasHigherNonZero) {
-          // Final group == 1 with any preceding non-zero groups: use 'เอ็ด'
-          buffer.write('เอ็ด');
-        } else {
-          buffer.write(_formatUnderMillion(g));
-        }
+        buffer.write(
+          _formatUnderMillion(
+            g,
+            isLastGroup: isLastGroup,
+            isSingleGroup: isSingleGroup,
+            isOnlyOne: isOnlyOne,
+            isFinalGroup: (i == 0),
+            isFinalOverall: (i == 0 && groups.length > 1 && g % 10 == 1),
+          ),
+        );
       }
-      if (i > 0) {
+      if (i > 0 && (g != 0 || buffer.isNotEmpty)) {
         buffer.write('ล้าน');
       }
     }
@@ -170,7 +215,14 @@ class _ThaiNumberFormatter {
     return result.isEmpty ? 'ศูนย์' : result;
   }
 
-  static String _formatUnderMillion(int n) {
+  static String _formatUnderMillion(
+    int n, {
+    bool isLastGroup = true,
+    bool isSingleGroup = false,
+    bool isOnlyOne = false,
+    bool isFinalGroup = true,
+    bool isFinalOverall = false,
+  }) {
     assert(n >= 0 && n < 1000000);
     if (n == 0) return '';
 
@@ -178,65 +230,65 @@ class _ThaiNumberFormatter {
     final digits = s.split('').map(int.parse).toList(growable: false);
     final sb = StringBuffer();
 
-    // Hundred-thousands
-    final ht = digits[0];
-    if (ht != 0) {
-      if (ht == 1) {
-        sb..write('หนึ่ง')..write('แสน');
+    // [แสน]
+    if (digits[0] != 0) {
+      if (digits[0] == 1) {
+        sb.write('หนึ่งแสน');
       } else {
-        sb..write(_digits[ht])..write('แสน');
+        sb.write('${_digits[digits[0]]}แสน');
       }
     }
-
-    // Ten-thousands
-    final tt = digits[1];
-    if (tt != 0) {
-      if (tt == 1) {
+    // [หมื่น]
+    if (digits[1] != 0) {
+      if (digits[1] == 1) {
         sb.write('หนึ่งหมื่น');
+      } else if (digits[1] == 2) {
+        sb.write('สองหมื่น');
       } else {
-        sb..write(_digits[tt])..write('หมื่น');
+        sb.write('${_digits[digits[1]]}หมื่น');
       }
     }
-
-    // Thousands
-    final th = digits[2];
-    if (th != 0) {
-      if (th == 1) {
+    // [พัน]
+    if (digits[2] != 0) {
+      if (digits[2] == 1) {
         sb.write('หนึ่งพัน');
       } else {
-        sb..write(_digits[th])..write('พัน');
+        sb.write('${_digits[digits[2]]}พัน');
       }
     }
-
-    // Hundreds
-    final h = digits[3];
-    if (h != 0) {
-      sb..write(_digits[h])..write('ร้อย');
-    }
-
-    // Tens
-    final t = digits[4];
-    if (t != 0) {
-      if (t == 1) {
+    // [ร้อย]
+    if (digits[3] != 0) sb.write('${_digits[digits[3]]}ร้อย');
+    // [สิบ]
+    if (digits[4] != 0) {
+      if (digits[4] == 1) {
         sb.write('สิบ');
-      } else if (t == 2) {
+      } else if (digits[4] == 2) {
         sb.write('ยี่สิบ');
       } else {
-        sb..write(_digits[t])..write('สิบ');
+        sb.write('${_digits[digits[4]]}สิบ');
       }
     }
-
-    // Units
-    final unit = digits[5];
-    if (unit != 0) {
-      final hasHigher = n > 10;
-      if (unit == 1 && hasHigher) {
+    // [หน่วย]
+    if (digits[5] != 0) {
+      // เงื่อนไข "เอ็ด":
+      // - ถ้าเป็นหลักหน่วยของกลุ่มสุดท้าย (isLastGroup)
+      // - ไม่ใช่กรณีที่กลุ่มเดียวและเป็น 1 (isSingleGroup && n == 1)
+      // - ไม่ใช่กรณีที่เลขโดด (isOnlyOne)
+      // - ถ้าเป็นกลุ่มสุดท้ายของจำนวนเต็ม (isFinalOverall) เช่น 1,000,001 => หนึ่งล้านเอ็ด
+      if (digits[5] == 1 &&
+          ((isLastGroup &&
+                  (digits[4] != 0 ||
+                      digits[3] != 0 ||
+                      digits[2] != 0 ||
+                      digits[1] != 0 ||
+                      digits[0] != 0) &&
+                  !isOnlyOne) ||
+              isFinalOverall)) {
         sb.write('เอ็ด');
       } else {
-        sb.write(_digits[unit]);
+        sb.write(_digits[digits[5]]);
       }
     }
-
     return sb.toString();
   }
 }
