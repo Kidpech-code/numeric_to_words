@@ -49,7 +49,7 @@ void main() {
       });
 
       test('one thousand and one', () {
-        expect(thaiIntToWords(1001), 'หนึ่งพันหนึ่ง');
+        expect(thaiIntToWords(1001), 'หนึ่งพันเอ็ด');
       });
 
       test('one thousand and ten', () {

@@ -12,7 +12,7 @@ String thaiNumberToWords(
   }
 
   final words = _ThaiNumberFormatter._formatBigInt(absVal);
-  return isNegative ? '${options.negativeWord}\$words' : words;
+  return isNegative ? '${options.negativeWord}$words' : words;
 }
 
 String thaiIntToWords(
