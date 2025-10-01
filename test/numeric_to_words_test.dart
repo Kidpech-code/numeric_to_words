@@ -109,6 +109,13 @@ void main() {
       );
       expect(thaiBahtText(10.5, options: opts), 'สิบดอลลาร์ห้าสิบเซนต์');
     });
+
+    test('string and BigInt inputs', () {
+      expect(thaiBahtText('12.34'), 'สิบสองบาทสามสิบสี่สตางค์');
+      expect(thaiBahtText('1,234.5'), 'หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบสตางค์');
+      expect(thaiBahtText('-0.75'), 'ลบเจ็ดสิบห้าสตางค์');
+      expect(thaiBahtText(BigInt.from(-12)), 'ลบสิบสองบาทถ้วน');
+    });
   });
 
   group('thaiDecimal', () {
