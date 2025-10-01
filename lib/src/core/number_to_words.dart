@@ -1,24 +1,14 @@
 import 'options.dart';
 
-/// Options container (assumed existing in options.dart):
-/// class ThaiNumberOptions {
-///   final String zeroWord; // default 'ศูนย์'
-///   final String negativeWord; // default 'ลบ'
-///   const ThaiNumberOptions({this.zeroWord = 'ศูนย์', this.negativeWord = 'ลบ'});
-/// }
+/// Core Thai number-to-words helpers.
 ///
-/// Core functions provided:
-/// - thaiNumberToWords(BigInt)
-/// - thaiIntToWords(int)
-/// - thaiBahtText(num | String)
+/// Exposes the main entry points used throughout the package:
+/// - [thaiNumberToWords] for [BigInt] values.
+/// - [thaiIntToWords] for convenience with `int`.
+/// - [thaiBahtText] for BAHTTEXT-style currency reading with rounding to 2 decimals.
 ///
-/// Enhancements in this revision:
-/// 1. Fixed cross-group final '1' => 'เอ็ด' rule when the overall number > 1 and final group == 1
-///    (e.g. 1,000,001 => หนึ่งล้านเอ็ด, 1,001,000,001 => หนึ่งพันเอ็ดล้านเอ็ด)
-/// 2. Removed stray backslash before positive forms when negative.
-/// 3. Added thaiBahtText for money reading (BAHTTEXT style) with correct rounding to 2 decimals.
-/// 4. Added internal helpers for safe decimal parsing & rounding.
-/// 5. Left existing under-million formatting logic intact for intra-group 'เอ็ด' rule (n > 10).
+/// These functions honour the configuration specified in [ThaiNumberOptions]
+/// and its specialized subclasses defined in `options.dart`.
 
 String thaiNumberToWords(
   BigInt value, {
@@ -54,17 +44,20 @@ String thaiBahtText(
   ThaiNumberOptions options = const ThaiNumberOptions(),
 }) {
   // Accept num / String / int / double.
-  BigInt satangTotal;
-  bool negative = false;
+  late BigInt satangTotal;
+  var negative = false;
   if (amount is String) {
-    amount = amount.trim();
-    if (amount.startsWith('-')) {
-      negative = true;
-      amount = amount.substring(1);
+    var input = amount.trim();
+    if (input.startsWith('+')) {
+      input = input.substring(1);
     }
-    if (amount.isEmpty) amount = '0';
+    if (input.startsWith('-')) {
+      negative = true;
+      input = input.substring(1);
+    }
+    if (input.isEmpty) input = '0';
     // Normalize: allow commas
-    final cleaned = amount.replaceAll(',', '');
+    final cleaned = input.replaceAll(',', '');
     // Split integer/ fraction parts
     final parts = cleaned.split('.');
     final intPart = parts[0].isEmpty ? '0' : parts[0];
@@ -75,50 +68,43 @@ String thaiBahtText(
     }
     // Build integer of satangs with high precision: (intPart * 10^scale + fracPart) then round to 2 decimals
     final scale = fracPart.length;
-    final bigIntPart = BigInt.parse(intPart.isEmpty ? '0' : intPart);
+    final bigIntPart = BigInt.parse(intPart);
     final fracInt = fracPart.isEmpty ? BigInt.zero : BigInt.parse(fracPart);
-    // Total in 10^-scale units.
     // Convert to satang: multiply by 100, then divide by 10^scale with rounding.
     final power = BigInt.from(10).pow(scale);
-    final scaled =
-        bigIntPart * power + fracInt; // integer representing value * 10^scale
-    if (power == BigInt.zero) {
-      satangTotal = bigIntPart * BigInt.from(100);
-    } else {
-      // Multiply scaled by 100 then divide by power with rounding.
-      final numerator = scaled * BigInt.from(100);
-      final quotient = numerator ~/ power;
-      final remainder = numerator % power;
-      // Rounding: compare remainder * 2 >= power
-      satangTotal = (remainder * BigInt.from(2) >= power)
-          ? (quotient + BigInt.one)
-          : quotient;
-    }
+    final scaled = bigIntPart * power + fracInt;
+    final numerator = scaled * BigInt.from(100);
+    final quotient = numerator ~/ power;
+    final remainder = numerator % power;
+    // Rounding: compare remainder * 2 >= power
+    satangTotal = (remainder * BigInt.from(2) >= power)
+        ? (quotient + BigInt.one)
+        : quotient;
+    amount = input;
   } else if (amount is num) {
     if (amount.isNaN) throw ArgumentError('amount is NaN');
     if (amount.isInfinite) throw ArgumentError('amount is infinite');
-    if (amount < 0) {
-      negative = true;
-      amount = -amount;
-    }
+    final isNegative = amount < 0;
+    final magnitude = isNegative ? -amount : amount;
     // Avoid double precision issues by using string with adequate precision.
-    final asStr = amount.toStringAsFixed(10); // high precision buffer
-    return thaiBahtText(
-      asStr,
-      options: options,
-    ).replaceFirst(options.negativeWord, negative ? options.negativeWord : '');
+    final asStr = magnitude.toStringAsFixed(10); // high precision buffer
+    final result = thaiBahtText(asStr, options: options);
+    return isNegative ? '${options.negativeWord}$result' : result;
   } else if (amount is BigInt) {
-    satangTotal = amount * BigInt.from(100);
+    if (amount.isNegative) {
+      negative = true;
+      satangTotal = (-amount) * BigInt.from(100);
+    } else {
+      satangTotal = amount * BigInt.from(100);
+    }
   } else {
-    throw ArgumentError('Unsupported amount type: \\${amount.runtimeType}');
+    throw ArgumentError('Unsupported amount type: ${amount.runtimeType}');
   }
 
   if (negative) {
-    return options.negativeWord +
-        thaiBahtText(
-          _satangBigIntToDecimalString(satangTotal),
-          options: options,
-        );
+    final positive = _satangBigIntToDecimalString(satangTotal);
+    final result = thaiBahtText(positive, options: options);
+    return '${options.negativeWord}$result';
   }
 
   final baht = satangTotal ~/ BigInt.from(100);
@@ -157,7 +143,7 @@ String _satangBigIntToDecimalString(BigInt satang) {
   final abs = isNeg ? -satang : satang;
   final baht = abs ~/ BigInt.from(100);
   final sat = (abs % BigInt.from(100)).toInt();
-  final s = '\\$baht.${sat.toString().padLeft(2, '0')}';
+  final s = '${baht.toString()}.${sat.toString().padLeft(2, '0')}';
   return isNeg ? '-$s' : s;
 }
 

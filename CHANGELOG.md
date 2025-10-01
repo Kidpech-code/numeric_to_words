@@ -16,7 +16,7 @@
 
 ## 0.1.3
 
-- Docs polish for pub points: move full Thai-language section to `docs/README.th.md` and keep main README primarily English.
+- Docs polish for pub points: move full Thai-language section to `doc/README.th.md` and keep main README primarily English.
 - Fixed an unclosed code block in README.
 
 ## 0.2.0
