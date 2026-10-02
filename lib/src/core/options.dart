@@ -1,28 +1,30 @@
-/// Options controlling general number formatting in Thai.
+/// Words used when converting an integer to Thai text.
 class ThaiNumberOptions {
-  /// Prefix for negative numbers (e.g., "ลบ").
+  /// Prefix for negative values. Defaults to `ลบ`.
   final String negativeWord;
 
-  /// Word used for zero when number is exactly 0 (e.g., "ศูนย์").
+  /// Word returned for zero. Defaults to `ศูนย์`.
   final String zeroWord;
 
+  /// Creates reusable options for Thai number conversion.
   const ThaiNumberOptions({this.negativeWord = 'ลบ', this.zeroWord = 'ศูนย์'});
 }
 
-/// Options controlling Baht text formatting.
+/// Words and units used by the exported `thaiBahtText` formatter.
 class ThaiBahtTextOptions extends ThaiNumberOptions {
-  /// Whether to append the integerSuffix (e.g. 'ถ้วน') when there is no minor part. Default: true.
+  /// Whether to append [integerSuffix] when there is no fractional unit.
   final bool useIntegerSuffix;
 
-  /// Major currency unit (default: บาท).
+  /// Major unit, such as `บาท`. Defaults to `บาท`.
   final String majorUnit;
 
-  /// Minor currency unit (default: สตางค์).
+  /// Minor unit, such as `สตางค์`. Defaults to `สตางค์`.
   final String minorUnit;
 
-  /// Suffix used when there is no minor part (default: ถ้วน).
+  /// Suffix for whole amounts. Defaults to `ถ้วน`.
   final String integerSuffix;
 
+  /// Creates options with Thai baht units and words by default.
   const ThaiBahtTextOptions({
     super.negativeWord = 'ลบ',
     super.zeroWord = 'ศูนย์',
@@ -33,19 +35,23 @@ class ThaiBahtTextOptions extends ThaiNumberOptions {
   });
 }
 
-/// Options controlling Decimal number reading.
+/// Words and fraction display used by `thaiDecimal`.
 class ThaiDecimalOptions extends ThaiNumberOptions {
-  /// Word spoken for the decimal point (default: จุด).
+  /// Word spoken for the decimal point. Defaults to `จุด`.
   final String decimalPointWord;
 
-  /// When provided, formats the number using fixed fraction digits before reading.
-  /// e.g., fixedFractionDigits: 2 -> 0.5 reads as "ศูนย์จุดห้าศูนย์".
+  /// Number of fraction digits to format before reading them one by one.
+  ///
+  /// For example, `2` makes `0.5` read as `ศูนย์จุดห้าศูนย์`.
+  /// Formatting uses `num.toStringAsFixed`, including its rounding behavior.
   final int? fixedFractionDigits;
 
-  /// If true, when the fractional part is zero (e.g. 1.0 or 1.00), the output omits
-  /// the decimal point and reads only the integer portion (default: true; outputs "หนึ่ง").
+  /// Whether a zero fractional part is omitted. Defaults to `true`.
+  ///
+  /// For example, `1.0` reads as `หนึ่ง` when this is true.
   final bool omitPointWhenFractionZero;
 
+  /// Creates options for reading decimal numbers.
   const ThaiDecimalOptions({
     super.negativeWord = 'ลบ',
     super.zeroWord = 'ศูนย์',
@@ -55,17 +61,18 @@ class ThaiDecimalOptions extends ThaiNumberOptions {
   });
 }
 
-/// Options for reading digits one-by-one (e.g., 123 -> "หนึ่งสองสาม").
+/// Options for reading a numeric string one digit at a time with `thaiDigits`.
 class ThaiDigitsOptions extends ThaiNumberOptions {
-  /// Separator inserted between each spoken token. Default '' (no space).
+  /// Separator between spoken tokens. Defaults to an empty string.
   final String separator;
 
-  /// If true and a decimal point '.' is present in input string, include [decimalPointWord].
+  /// Whether to say [decimalPointWord] for `.`. Defaults to `false`.
   final bool includeDecimalPoint;
 
-  /// The word for decimal point when [includeDecimalPoint] is true.
+  /// Word spoken for `.` when [includeDecimalPoint] is true. Defaults to `จุด`.
   final String decimalPointWord;
 
+  /// Creates options for reading individual digits.
   const ThaiDigitsOptions({
     super.negativeWord = 'ลบ',
     super.zeroWord = 'ศูนย์',

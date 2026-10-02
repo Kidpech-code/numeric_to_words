@@ -35,7 +35,7 @@ String thaiDigits(
   }
 
   final digitMap = [
-    'ศูนย์',
+    options.zeroWord,
     'หนึ่ง',
     'สอง',
     'สาม',

@@ -1,8 +1,10 @@
 import '../domain/currency.dart';
 
-/// Registry of currency units (selected set per provided list).
-/// Note: Names align with the Royal Institute list where applicable.
+/// Built-in English and Thai currency names for common currency codes.
 class CurrencyRegistry {
+  /// Currency units keyed by uppercase three-letter code, such as `USD`.
+  ///
+  /// This map is mutable, so applications can add or replace entries.
   static final Map<String, CurrencyUnit> byCode = {
     // Common examples
     'USD': const CurrencyUnit(
@@ -28,6 +30,7 @@ class CurrencyRegistry {
       englishSingular: 'yen',
       englishPlural: 'yen',
       thaiName: 'เยน',
+      minorUnitDigits: 0,
     ),
     'EUR': const CurrencyUnit(
       code: 'EUR',
@@ -52,36 +55,51 @@ class CurrencyRegistry {
       englishSingular: 'renminbi',
       englishPlural: 'renminbi',
       thaiName: 'หยวนเหรินหมินปี้',
+      englishMinorSingular: 'fen',
+      englishMinorPlural: 'fen',
+      thaiMinorName: 'เฟิน',
     ),
     'KRW': const CurrencyUnit(
       code: 'KRW',
       englishSingular: 'won',
       englishPlural: 'won',
       thaiName: 'วอน',
+      minorUnitDigits: 0,
     ),
     'VND': const CurrencyUnit(
       code: 'VND',
       englishSingular: 'dong',
       englishPlural: 'dong',
       thaiName: 'ดอง',
+      minorUnitDigits: 0,
     ),
     'LAK': const CurrencyUnit(
       code: 'LAK',
       englishSingular: 'kip',
       englishPlural: 'kip',
       thaiName: 'กีบ',
+      englishMinorSingular: 'aht',
+      englishMinorPlural: 'aht',
+      thaiMinorName: 'อัด',
     ),
     'KWD': const CurrencyUnit(
       code: 'KWD',
       englishSingular: 'dinar',
       englishPlural: 'dinars',
       thaiName: 'ดีนาร์คูเวต',
+      englishMinorSingular: 'fils',
+      englishMinorPlural: 'fils',
+      thaiMinorName: 'ฟิลส์',
+      minorUnitDigits: 3,
     ),
     'SAR': const CurrencyUnit(
       code: 'SAR',
       englishSingular: 'riyal',
       englishPlural: 'riyals',
       thaiName: 'ริยัลซาอุดีอาระเบีย',
+      englishMinorSingular: 'halala',
+      englishMinorPlural: 'halalas',
+      thaiMinorName: 'ฮาลาลา',
     ),
     'HKD': const CurrencyUnit(
       code: 'HKD',
@@ -128,6 +146,5 @@ class CurrencyRegistry {
       englishMinorPlural: 'cents',
       thaiMinorName: 'เซนต์',
     ),
-    // Add more as needed...
   };
 }

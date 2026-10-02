@@ -6,7 +6,6 @@ platforms supported by Dart (iOS, Android, Web, Windows, macOS, Linux) and is WA
 
 [![Pub Version](https://img.shields.io/pub/v/thai_number_words)](https://pub.dev/packages/thai_number_words)
 [![Pub Points](https://img.shields.io/pub/points/thai_number_words)](https://pub.dev/packages/thai_number_words/score)
-[![Popularity](https://img.shields.io/pub/popularity/thai_number_words)](https://pub.dev/packages/thai_number_words/score)
 [![Likes](https://img.shields.io/pub/likes/thai_number_words)](https://pub.dev/packages/thai_number_words)
 
 This package provides easy-to-use utilities for converting numbers to Thai text, with customizable options.
@@ -19,20 +18,40 @@ This package provides easy-to-use utilities for converting numbers to Thai text,
 - Handle fractions in the format "X ส่วน Y"
 - Easily customize words and reading formats
 
-## Getting Started
+## Quick start
 
-```dart
-// Preferred entrypoint
-import 'package:thai_number_words/thai_number_words.dart';
-// (Legacy entrypoint remains available: package:thai_number_words/numeric_to_words.dart)
-```
-
-## Install
+Add the package with `dart pub add thai_number_words` (or `flutter pub add thai_number_words` in a Flutter project), or add it to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  thai_number_words: ^0.2.2
+  thai_number_words: ^1.0.0
 ```
+
+Then copy this into a Dart file:
+
+```dart
+import 'package:thai_number_words/thai_number_words.dart';
+
+void main() {
+  print(thaiIntToWords(121)); // หนึ่งร้อยยี่สิบเอ็ด
+  print(thaiBahtText(1.1));  // หนึ่งบาทสิบสตางค์
+}
+```
+
+The legacy `package:thai_number_words/numeric_to_words.dart` import remains available.
+Run the full example with `dart run example/main.dart` from this repository.
+
+## Choose a function
+
+| Need | Use |
+| --- | --- |
+| Integer, including `BigInt` | `thaiIntToWords` or `thaiNumberToWords` |
+| Amount in baht | `thaiBahtText` |
+| Other currencies | `thaiCurrencyText` or `englishCurrencyText` with `CurrencyRegistry` |
+| Decimal read digit by digit after the point | `thaiDecimal` |
+| Fraction | `thaiFraction` |
+| ID, OTP, or other digits with leading zeroes | `thaiDigits` (pass a `String`) |
+| Thai or Roman numerals | `parseThaiInteger`, `arabicDigitsToThai`, `thaiNumeralsToArabic`, `parseRoman`, or `romanToThaiWords` |
 
 ## Examples (Quick Start)
 
@@ -53,6 +72,7 @@ thaiBahtText(0); // "ศูนย์บาทถ้วน"
 thaiBahtText(1.1); // "หนึ่งบาทสิบสตางค์"
 thaiBahtText(1.005); // "หนึ่งบาทหนึ่งสตางค์" (half-up rounding)
 thaiBahtText(-12.3); // "ลบสิบสองบาทสามสิบสตางค์"
+thaiBahtText('1,234.56'); // "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์"
 
 // Customize units
 thaiBahtText(
@@ -63,6 +83,8 @@ thaiBahtText(
 // Omit 'ถ้วน' for integer baht
 thaiBahtText(100, options: const ThaiBahtTextOptions(useIntegerSuffix: false)); // "หนึ่งร้อยบาท"
 ```
+
+Pass a decimal `String` for exact monetary input; existing `num` calls continue to work.
 
 ### Currency (English/Thai words):
 
@@ -81,7 +103,13 @@ thaiCurrencyText(25, usd); // "ยี่สิบห้า ดอลลาร์
 final jpy = CurrencyRegistry.byCode['JPY']!;
 englishCurrencyText(1250, jpy); // "one thousand two hundred fifty yen"
 thaiCurrencyText(1250, jpy); // "หนึ่งพันสองร้อยห้าสิบ เยน"
+englishCurrencyText(1.5, jpy); // "two yen" (JPY has no minor unit)
+
+final kwd = CurrencyRegistry.byCode['KWD']!;
+englishCurrencyText('1.2345', kwd); // "one dinar and two hundred thirty-five fils"
 ```
+
+Both currency formatters also accept decimal `String` values for exact monetary input.
 
 ### Decimals:
 
@@ -121,7 +149,7 @@ parseRoman('CM'); // 900
 romanToThaiWords('IV'); // "สี่"
 ```
 
-Overline note: Combining overline (U+0305) multiplies a symbol by 1,000. Example: `M\u0305` = 1,000,000.
+Overline note: Combining overline (U+0305) multiplies a symbol by 1,000. For example, `M̅` = 1,000,000 (write `M\u0305` in Dart).
 
 ```dart
 parseRoman('M\u0305'); // 1000000
@@ -153,7 +181,7 @@ parseThaiInteger('๑๒๓'); // BigInt(123)
 | C       | 100       | หนึ่งร้อย  |
 | D       | 500       | ห้าร้อย    |
 | M       | 1000      | หนึ่งพัน   |
-| M\u0305 | 1,000,000 | หนึ่งล้าน  |
+| M̅      | 1,000,000 | หนึ่งล้าน  |
 
 ## Summary: integers vs decimals/fractions
 
@@ -193,15 +221,14 @@ const digitOpts = ThaiDigitsOptions(
 
 ## Compatibility
 
-- Supports latest stable Dart/Flutter per `pubspec.yaml`.
+- Requires Dart `^3.8.1` (including compatible Flutter versions).
 - No external runtime dependencies.
 
 ## Tips & Best Practices
 
-- Use the right utility for the job: `thaiIntToWords`/`thaiNumberToWords` (integers), `thaiBahtText` (currency), `thaiDecimal` (decimals), `thaiFraction` (fractions), `thaiDigits` (digit-by-digit).
-- Prefer `const` options for reuse; use `BigInt` for very large numbers.
-- Currency rounding: pass raw numbers to `thaiBahtText` (it performs half-up to 2 decimals).
+- Prefer `const` options for reuse; use `BigInt` with `thaiNumberToWords` for very large integers.
+- Currency rounding is half-up to 2 decimal places; pass a decimal `String` when exact input matters.
 
 ---
 
-Thai readers: อ่านเอกสารฉบับเต็มภาษาไทยได้ที่ doc/README.th.md
+Thai readers: [อ่านเอกสารภาษาไทย](doc/README.th.md)

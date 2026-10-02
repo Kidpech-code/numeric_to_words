@@ -49,6 +49,6 @@ String arabicDigitsToThai(String input) {
 ///
 /// Example: `parseThaiInteger('−๑๒๓')` -> `-123`.
 BigInt parseThaiInteger(String input) {
-  final s = thaiNumeralsToArabic(input.trim());
+  final s = thaiNumeralsToArabic(input.trim()).replaceFirst('−', '-');
   return BigInt.parse(s);
 }
