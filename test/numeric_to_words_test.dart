@@ -109,6 +109,88 @@ void main() {
       );
       expect(thaiBahtText(10.5, options: opts), 'สิบดอลลาร์ห้าสิบเซนต์');
     });
+
+    test('can omit the integer suffix as documented', () {
+      expect(
+        thaiBahtText(
+          100,
+          options: const ThaiBahtTextOptions(useIntegerSuffix: false),
+        ),
+        'หนึ่งร้อยบาท',
+      );
+    });
+
+    test('reads exact decimal strings and scientific notation', () {
+      expect(
+        thaiBahtText('1,234.56'),
+        'หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์',
+      );
+      expect(thaiBahtText(1e-7), 'ศูนย์บาทถ้วน');
+    });
+
+    test('accepts exact negative strings and BigInt amounts', () {
+      expect(thaiBahtText('-0.005'), 'ลบศูนย์บาทหนึ่งสตางค์');
+      expect(thaiBahtText(BigInt.from(-12)), 'ลบสิบสองบาทถ้วน');
+    });
+
+    test('rejects malformed money strings', () {
+      expect(() => thaiBahtText('12,34.56'), throwsFormatException);
+    });
+
+    test('rounds only once at the satang boundary', () {
+      expect(thaiBahtText(1.0049), 'หนึ่งบาทถ้วน');
+      final usd = CurrencyRegistry.byCode['USD']!;
+      expect(englishCurrencyText(1.0049, usd), 'one dollar');
+      expect(thaiCurrencyText(1.0049, usd), 'หนึ่ง ดอลลาร์สหรัฐ');
+    });
+
+    test('accepts exact decimal strings for other currencies', () {
+      final usd = CurrencyRegistry.byCode['USD']!;
+      expect(
+        englishCurrencyText('25.05', usd),
+        'twenty-five dollars and five cents',
+      );
+      expect(thaiCurrencyText('25.05', usd), 'ยี่สิบห้า ดอลลาร์สหรัฐห้าเซนต์');
+    });
+
+    test('rounds JPY to a whole yen without inventing cents', () {
+      final jpy = CurrencyRegistry.byCode['JPY']!;
+      expect(englishCurrencyText(1.499, jpy), 'one yen');
+      expect(englishCurrencyText(1.5, jpy), 'two yen');
+      expect(thaiCurrencyText(1.5, jpy), 'สอง เยน');
+    });
+
+    test('uses the registered minor units and precision', () {
+      expect(
+        englishCurrencyText(1.5, CurrencyRegistry.byCode['KRW']!),
+        'two won',
+      );
+      expect(
+        englishCurrencyText(1.5, CurrencyRegistry.byCode['VND']!),
+        'two dong',
+      );
+      final kwd = CurrencyRegistry.byCode['KWD']!;
+      expect(
+        englishCurrencyText('1.2345', kwd),
+        'one dinar and two hundred thirty-five fils',
+      );
+      expect(
+        thaiCurrencyText('1.2345', kwd),
+        'หนึ่ง ดีนาร์คูเวตสองร้อยสามสิบห้าฟิลส์',
+      );
+      expect(
+        englishCurrencyText(1.01, CurrencyRegistry.byCode['CNY']!),
+        'one renminbi and one fen',
+      );
+      expect(
+        englishCurrencyText(1.01, CurrencyRegistry.byCode['LAK']!),
+        'one kip and one aht',
+      );
+      expect(
+        englishCurrencyText(1.01, CurrencyRegistry.byCode['SAR']!),
+        'one riyal and one halala',
+      );
+    });
   });
 
   group('thaiDecimal', () {
@@ -133,6 +215,20 @@ void main() {
       expect(
         thaiDecimal(1.2, options: ThaiDecimalOptions(fixedFractionDigits: 3)),
         'หนึ่งจุดสองศูนย์ศูนย์',
+      );
+    });
+
+    test('reads small numbers shown in scientific notation', () {
+      expect(thaiDecimal(1e-7), 'ศูนย์จุดศูนย์ศูนย์ศูนย์ศูนย์ศูนย์ศูนย์หนึ่ง');
+    });
+
+    test('includes a zero after the point when requested for integers', () {
+      expect(
+        thaiDecimal(
+          1,
+          options: const ThaiDecimalOptions(omitPointWhenFractionZero: false),
+        ),
+        'หนึ่งจุดศูนย์',
       );
     });
   });
@@ -171,12 +267,23 @@ void main() {
         'หนึ่ง สอง จุด สาม ศูนย์',
       );
     });
+
+    test('uses the configured word for zero', () {
+      expect(
+        thaiDigits('007', options: const ThaiDigitsOptions(zeroWord: 'ซีโร่')),
+        'ซีโร่ซีโร่เจ็ด',
+      );
+    });
   });
 
   group('thai numerals parsing', () {
     test('normalize Thai numerals', () {
       expect(thaiDigits('๑๒๓๔๕'), 'หนึ่งสองสามสี่ห้า');
       expect(thaiDigits('-๐๐๗'), 'ลบศูนย์ศูนย์เจ็ด');
+    });
+
+    test('parses the documented Unicode minus sign', () {
+      expect(parseThaiInteger('−๑๒๓'), BigInt.from(-123));
     });
   });
 

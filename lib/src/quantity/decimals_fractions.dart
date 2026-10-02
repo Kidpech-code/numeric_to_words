@@ -1,11 +1,12 @@
 import '../core/options.dart';
 import '../core/number_to_words.dart';
+import '../core/decimal_string.dart';
 
 /// Reads a decimal number in Thai, pronouncing the decimal point and each digit after it.
 /// Examples:
 /// - 0.5 -> ศูนย์จุดห้า
 /// - with fixedFractionDigits: 2, 0.5 -> ศูนย์จุดห้าศูนย์
-/// - 1.0 -> หนึ่ง (by default), unless [options.omitPointWhenFractionZero] is false.
+/// - 1.0 -> หนึ่ง (by default), unless [ThaiDecimalOptions.omitPointWhenFractionZero] is false.
 String thaiDecimal(
   num value, {
   ThaiDecimalOptions options = const ThaiDecimalOptions(),
@@ -20,10 +21,11 @@ String thaiDecimal(
   if (options.fixedFractionDigits != null) {
     s = value.abs().toStringAsFixed(options.fixedFractionDigits!);
   }
+  s = expandScientificNotation(s);
 
   final parts = s.split('.');
   final intPart = BigInt.parse(parts[0]);
-  final fracPart = parts.length > 1 ? parts[1] : '';
+  final fracPart = parts.length > 1 ? parts[1] : '0';
 
   final intWords = thaiNumberToWords(intPart, options: options);
 

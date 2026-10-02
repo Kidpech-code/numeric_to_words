@@ -1,25 +1,6 @@
 import '../core/number_to_words.dart' show thaiNumberToWords; // existing
 import '../domain/currency.dart';
-
-String _roundHalfUpToCentsString(num amount) {
-  final negative = amount < 0;
-  var value = amount.abs();
-  final s = value.toStringAsFixed(3); // guard against 1.005 issues
-  final parts = s.split('.');
-  var cents = int.parse(parts[1]);
-  var whole = int.parse(parts[0]);
-  // parts[1] has 3 digits; implement half-up to 2 digits
-  final hundred = cents ~/ 10; // first two digits
-  final third = cents % 10;
-  var minor = hundred + (third >= 5 ? 1 : 0);
-  if (minor == 100) {
-    whole += 1;
-    minor = 0;
-  }
-  final res =
-      '${negative ? '-' : ''}$whole.${minor.toString().padLeft(2, '0')}';
-  return res;
-}
+import '../currency/rounding.dart';
 
 /// English integer to words (minimal, up to trillions). For production, consider a full i18n lib.
 String _englishIntToWords(BigInt n) {
@@ -120,43 +101,50 @@ String _englishIntToWords(BigInt n) {
   return negative ? 'minus ${sb.toString()}' : sb.toString();
 }
 
-/// Format a number into English currency words, with minor unit when needed.
-String englishCurrencyText(num amount, CurrencyUnit currency) {
-  final rounded = _roundHalfUpToCentsString(amount);
-  final neg = rounded.startsWith('-');
-  final parts = (neg ? rounded.substring(1) : rounded).split('.');
-  final whole = BigInt.parse(parts[0]);
-  final minor = int.parse(parts[1]);
+/// Formats [amount] as English currency words, with a minor unit when needed.
+///
+/// Accepts [num], [BigInt], or an exact decimal [String]. Rounds half-up to
+/// [CurrencyUnit.minorUnitDigits] decimal places.
+/// Whole amounts must be below 10^21 for the built-in English word list.
+String englishCurrencyText(Object amount, CurrencyUnit currency) {
+  final rounded = roundMoney(amount, fractionDigits: currency.minorUnitDigits);
+  final neg = rounded.negative;
+  final scale = BigInt.from(10).pow(currency.minorUnitDigits);
+  final whole = rounded.units ~/ scale;
+  final minor = rounded.units % scale;
   final wholeWords = _englishIntToWords(whole);
   final wholeUnit = whole == BigInt.one
       ? currency.englishSingular
       : currency.englishPlural;
-  if (minor == 0) {
+  if (minor == BigInt.zero) {
     final s = '$wholeWords $wholeUnit';
     return neg ? 'minus $s' : s;
   }
-  final minorUnit = minor == 1
+  final minorUnit = minor == BigInt.one
       ? (currency.englishMinorSingular ?? 'cent')
       : (currency.englishMinorPlural ?? 'cents');
-  final minorWords = _englishIntToWords(BigInt.from(minor));
+  final minorWords = _englishIntToWords(minor);
   final s = '$wholeWords $wholeUnit and $minorWords $minorUnit';
   return neg ? 'minus $s' : s;
 }
 
-/// Format a number into Thai currency words using existing Thai number-to-words.
-String thaiCurrencyText(num amount, CurrencyUnit currency) {
-  final rounded = _roundHalfUpToCentsString(amount);
-  final neg = rounded.startsWith('-');
-  final parts = (neg ? rounded.substring(1) : rounded).split('.');
-  final whole = BigInt.parse(parts[0]);
-  final minor = int.parse(parts[1]);
+/// Formats [amount] as Thai currency words, with a minor unit when needed.
+///
+/// Accepts [num], [BigInt], or an exact decimal [String]. Rounds half-up to
+/// [CurrencyUnit.minorUnitDigits] decimal places.
+String thaiCurrencyText(Object amount, CurrencyUnit currency) {
+  final rounded = roundMoney(amount, fractionDigits: currency.minorUnitDigits);
+  final neg = rounded.negative;
+  final scale = BigInt.from(10).pow(currency.minorUnitDigits);
+  final whole = rounded.units ~/ scale;
+  final minor = rounded.units % scale;
   final wholeWords = thaiNumberToWords(whole);
-  if (minor == 0) {
+  if (minor == BigInt.zero) {
     final sep = currency.code == 'THB' ? '' : ' ';
     final s = '$wholeWords$sep${currency.thaiName}';
     return neg ? 'ลบ$s' : s;
   }
-  final minorWords = thaiNumberToWords(BigInt.from(minor));
+  final minorWords = thaiNumberToWords(minor);
   final minorName = currency.thaiMinorName ?? 'สตางค์';
   final sep = currency.code == 'THB' ? '' : ' ';
   final s = '$wholeWords$sep${currency.thaiName}$minorWords$minorName';

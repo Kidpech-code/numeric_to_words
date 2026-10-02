@@ -1,24 +1,13 @@
 import 'options.dart';
 
-/// Options container (assumed existing in options.dart):
-/// class ThaiNumberOptions {
-///   final String zeroWord; // default 'ศูนย์'
-///   final String negativeWord; // default 'ลบ'
-///   const ThaiNumberOptions({this.zeroWord = 'ศูนย์', this.negativeWord = 'ลบ'});
-/// }
+/// Reads a [BigInt] as Thai place-value words.
 ///
-/// Core functions provided:
-/// - thaiNumberToWords(BigInt)
-/// - thaiIntToWords(int)
-/// - thaiBahtText(num | String)
+/// Returns [ThaiNumberOptions.zeroWord] for zero and prefixes negative values
+/// with [ThaiNumberOptions.negativeWord]. For example, `1000001` becomes
+/// `หนึ่งล้านเอ็ด` and `-1` becomes `ลบหนึ่ง` with the default options.
 ///
-/// Enhancements in this revision:
-/// 1. Fixed cross-group final '1' => 'เอ็ด' rule when the overall number > 1 and final group == 1
-///    (e.g. 1,000,001 => หนึ่งล้านเอ็ด, 1,001,000,001 => หนึ่งพันเอ็ดล้านเอ็ด)
-/// 2. Removed stray backslash before positive forms when negative.
-/// 3. Added thaiBahtText for money reading (BAHTTEXT style) with correct rounding to 2 decimals.
-/// 4. Added internal helpers for safe decimal parsing & rounding.
-/// 5. Left existing under-million formatting logic intact for intra-group 'เอ็ด' rule (n > 10).
+/// Use [thaiIntToWords] for an [int]; use the package's `thaiDecimal` for
+/// fractional values.
 
 String thaiNumberToWords(
   BigInt value, {
@@ -35,20 +24,19 @@ String thaiNumberToWords(
   return isNegative ? '${options.negativeWord}$words' : words;
 }
 
+/// Reads an [int] as Thai place-value words.
+///
+/// This is equivalent to [thaiNumberToWords] with `BigInt.from(value)`.
 String thaiIntToWords(
   int value, {
   ThaiNumberOptions options = const ThaiNumberOptions(),
 }) => thaiNumberToWords(BigInt.from(value), options: options);
 
-/// Convert a numeric amount to Thai Baht text similar to Microsoft Office BAHTTEXT.
-/// Rounding: standard rounding to 2 decimal places (>= .005 of a satang triggers rounding).
-/// Examples:
-///   0 => ศูนย์บาทถ้วน
-///   0.05 => ห้าสตางค์
-///   0.5 => ห้าสิบสตางค์
-///   0.995 => หนึ่งบาทถ้วน
-///   1.005 => หนึ่งบาทหนึ่งสตางค์
-///   21.25 => ยี่สิบเอ็ดบาทยี่สิบห้าสตางค์
+/// Legacy baht formatter retained for callers importing this file directly.
+///
+/// The package entrypoints export the formatter from `currency/baht_text.dart`
+/// instead. This legacy function accepts [num], [BigInt], or a decimal [String]
+/// and uses fixed `บาท` and `สตางค์` unit names.
 String thaiBahtText(
   dynamic amount, {
   ThaiNumberOptions options = const ThaiNumberOptions(),

@@ -2,10 +2,6 @@
 
 เอกสารฉบับเต็มภาษาไทยสำหรับแพ็กเกจ thai_number_words
 
-> Tip: README หลักบน pub.dev เป็นภาษาอังกฤษเพื่อให้ได้คะแนนคุณภาพสูงสุด จึงย้ายเนื้อหาภาษาไทยฉบับเต็มมาไว้ที่ไฟล์นี้
-
----
-
 ## คำอธิบายโดยย่อ
 
 แพ็กเกจสำหรับแปลงตัวเลขเป็นข้อความภาษาไทย: จำนวนเต็ม สกุลเงิน (บาท/สตางค์) ทศนิยม เศษส่วน และอ่านทีละหลัก รองรับตัวเลขไทย (๐–๙) และเลขโรมัน พร้อมตัวเลือกปรับแต่งคำอ่านได้
@@ -18,15 +14,34 @@
 
 ## เริ่มต้นใช้งาน
 
+ติดตั้งในโปรเจกต์ Dart ด้วย `dart pub add thai_number_words` หรือโปรเจกต์ Flutter ด้วย `flutter pub add thai_number_words` จากนั้นคัดลอกโค้ดนี้ไปรัน:
+
 ```dart
-// Preferred entrypoint
 import 'package:thai_number_words/thai_number_words.dart';
-// (Legacy entrypoint is still available: package:thai_number_words/numeric_to_words.dart)
+
+void main() {
+  print(thaiIntToWords(121)); // หนึ่งร้อยยี่สิบเอ็ด
+  print(thaiBahtText(1.1));  // หนึ่งบาทสิบสตางค์
+}
 ```
+
+ยังใช้ import เดิม `package:thai_number_words/numeric_to_words.dart` ได้ ตัวอย่างที่รันได้ครบอยู่ใน [example/main.dart](../example/main.dart) (`dart run example/main.dart` จากโฟลเดอร์รีโป)
+
+## เลือกฟังก์ชันให้ตรงงาน
+
+| งาน | ฟังก์ชัน |
+| --- | --- |
+| จำนวนเต็ม รวมถึง `BigInt` | `thaiIntToWords` หรือ `thaiNumberToWords` |
+| จำนวนเงินบาท | `thaiBahtText` |
+| เงินสกุลอื่น | `thaiCurrencyText` หรือ `englishCurrencyText` กับ `CurrencyRegistry` |
+| ทศนิยม | `thaiDecimal` |
+| เศษส่วน | `thaiFraction` |
+| OTP หรือเลขที่ต้องรักษาศูนย์นำหน้า | `thaiDigits` โดยส่งค่าเป็น `String` |
+| เลขไทยหรือเลขโรมัน | `parseThaiInteger`, `arabicDigitsToThai`, `thaiNumeralsToArabic`, `parseRoman`, `romanToThaiWords` |
 
 ## ตัวอย่างการใช้งาน
 
-ดูตัวอย่างเต็มในโฟลเดอร์ example/
+ดูตัวอย่างเต็มใน [example/main.dart](../example/main.dart)
 
 ### จำนวนเต็ม (Integers)
 
@@ -43,6 +58,7 @@ thaiBahtText(0); // "ศูนย์บาทถ้วน"
 thaiBahtText(1.1); // "หนึ่งบาทสิบสตางค์"
 thaiBahtText(1.005); // "หนึ่งบาทหนึ่งสตางค์" (ปัดเศษ half-up)
 thaiBahtText(-12.3); // "ลบสิบสองบาทสามสิบสตางค์"
+thaiBahtText('1,234.56'); // "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์"
 
 // ปรับหน่วยเป็นสกุลอื่นได้
 thaiBahtText(
@@ -53,6 +69,20 @@ thaiBahtText(
 // ไม่เติม 'ถ้วน' กรณีจำนวนเต็ม
 thaiBahtText(100, options: const ThaiBahtTextOptions(useIntegerSuffix: false)); // "หนึ่งร้อยบาท"
 ```
+
+ถ้าต้องการเก็บจำนวนเงินตามที่ป้อนอย่างแม่นยำ ให้ส่งทศนิยมเป็น `String`; การส่ง `num` แบบเดิมยังใช้ได้
+
+### สกุลเงินอื่น
+
+```dart
+final usd = CurrencyRegistry.byCode['USD']!;
+englishCurrencyText(25, usd); // "twenty-five dollars"
+thaiCurrencyText(25, usd); // "ยี่สิบห้า ดอลลาร์สหรัฐ"
+englishCurrencyText(1.5, CurrencyRegistry.byCode['JPY']!); // "two yen"
+englishCurrencyText('1.2345', CurrencyRegistry.byCode['KWD']!); // "one dinar and two hundred thirty-five fils"
+```
+
+ทั้งสองฟังก์ชันรับจำนวนเงินเป็น `String` ได้เมื่อค่าทศนิยมต้องแม่นยำตามที่ป้อน
 
 ### ทศนิยม (Decimals)
 
@@ -99,7 +129,7 @@ romanToThaiWords('XV'); // "สิบห้า"
 romanToThaiWords('LXXX'); // "แปดสิบ"
 ```
 
-หมายเหตุ Overline (ขีดบน): ใช้ combining overline (U+0305) เพื่อคูณค่าของสัญลักษณ์ด้วย 1,000 ต่อหนึ่งตัวอักษร เช่น `M\u0305` = 1,000,000
+หมายเหตุ Overline (ขีดบน): ใช้ combining overline (U+0305) เพื่อคูณค่าของสัญลักษณ์ด้วย 1,000 เช่น `M̅` = 1,000,000 (เขียนเป็น `M\u0305` ใน Dart)
 
 ```dart
 parseRoman('M\u0305'); // 1000000
@@ -134,7 +164,7 @@ const digitOpts = ThaiDigitsOptions(
 ## เคสขอบ/ข้อควรระวัง
 
 - `thaiFraction` ห้ามตัวส่วนเป็นศูนย์ (จะ `throw ArgumentError`)
-- `thaiDigits` รองรับเฉพาะตัวเลข [0-9] และจุดหนึ่งตำแหน่ง
+- `thaiDigits` รับเลขอารบิกหรือเลขไทย (๐–๙) และจุดทศนิยมได้ไม่เกินหนึ่งตำแหน่ง
 - ควรใช้ `thaiDecimal`/`thaiBahtText` แทน `thaiIntToWords` กับทศนิยม/จำนวนเงิน
 
 ## ช่วยกันพัฒนา

@@ -11,6 +11,7 @@ void main() {
   print(thaiBahtText(1.1)); // หนึ่งบาทสิบสตางค์
   print(thaiBahtText(1.005)); // หนึ่งบาทหนึ่งสตางค์
   print(thaiBahtText(-12.3)); // ลบสิบสองบาทสามสิบสตางค์
+  print(thaiBahtText('1,234.56')); // หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์
 
   // Custom units
   print(
@@ -50,8 +51,15 @@ void main() {
   print(thaiFraction(BigInt.from(3), BigInt.from(4))); // สามส่วนสี่
   print(thaiFraction(BigInt.from(-1), BigInt.from(2))); // ลบหนึ่งส่วนสอง
 
-  // New: English/Thai currency formatting for USD
+  // English/Thai currency formatting for USD
   final usd = CurrencyRegistry.byCode['USD']!;
   print(englishCurrencyText(25, usd)); // twenty-five dollars
   print(thaiCurrencyText(25, usd)); // ยี่สิบห้า ดอลลาร์สหรัฐ
+
+  // IDs, Thai numerals, and Roman numerals
+  print(thaiDigits('0012')); // ศูนย์ศูนย์หนึ่งสอง
+  print(arabicDigitsToThai('123')); // ๑๒๓
+  print(parseThaiInteger('๑๒๓')); // 123
+  print(romanToThaiWords('IV')); // สี่
+  print(romanToThaiWords('M\u0305')); // หนึ่งล้าน
 }
